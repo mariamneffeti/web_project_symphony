@@ -1,0 +1,197 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Article Details{% endblock %}
+{% block page_title %}Articles{% endblock %}
+{% set active_page = 'Articles' %}
+
+{% block stylesheets %}
+    <style>
+        .detail-card {
+            max-width: 780px;
+            margin: 0 auto;
+            animation: fadeUp .4s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Hero cover ──────────────────────────────────────────── */
+        .article-hero {
+            position: relative;
+            height: 220px;
+            border-radius: var(--radius) var(--radius) 0 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--teal), var(--navy));
+        }
+
+        .article-hero img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: .55;
+        }
+
+        .article-hero-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.75rem 2rem;
+            color: white;
+        }
+
+        .article-hero-content h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        /* ── Detail body ─────────────────────────────────────────── */
+        .detail-body { padding: 2rem; }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: .9rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-item:last-child { border-bottom: none; }
+
+        .detail-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: rgba(56,128,135,.1);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--teal);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .detail-label {
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #9ba4ac;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .detail-value { font-weight: 500; color: #1a1a1a; line-height: 1.6; }
+
+        /* ── Category pill ───────────────────────────────────────── */
+        .cat-pill {
+            display: inline-block;
+            font-size: .78rem;
+            font-weight: 600;
+            border-radius: 20px;
+            padding: .3em .9em;
+            background: rgba(56,128,135,.12);
+            color: var(--teal);
+            letter-spacing: .04em;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <main class="container page-content">
+        <div class="detail-card card shadow-sm">
+
+            {# ── Hero ──────────────────────────────────────────────────── #}
+            <div class="article-hero">
+                {% if article.arImage %}
+                    <img src="{{ article.arImage }}" alt="cover"
+                         onerror="this.style.display='none'">
+                {% endif %}
+                <div class="article-hero-content">
+            <span class="cat-pill mb-2" style="background:rgba(255,255,255,.2);color:#fff;">
+                {{ article.category }}
+            </span>
+                    <h2>{{ article.title }}</h2>
+                </div>
+            </div>
+
+            {# ── Body ──────────────────────────────────────────────────── #}
+            <div class="detail-body">
+
+                <div class="detail-item">
+                    <div class="detail-icon"><i class="bi bi-hash"></i></div>
+                    <div>
+                        <div class="detail-label">Article ID</div>
+                        <div class="detail-value">#{{ article.id }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon"><i class="bi bi-person"></i></div>
+                    <div>
+                        <div class="detail-label">Author</div>
+                        <div class="detail-value">{{ article.authorName }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon"><i class="bi bi-tag"></i></div>
+                    <div>
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">
+                            <span class="cat-pill">{{ article.category }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if article.arDate %}
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="bi bi-calendar3"></i></div>
+                        <div>
+                            <div class="detail-label">Publish Date</div>
+                            <div class="detail-value">{{ article.arDate|date('d M Y') }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if article.description %}
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="bi bi-file-text"></i></div>
+                        <div>
+                            <div class="detail-label">Description</div>
+                            <div class="detail-value">{{ article.description }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if article.link %}
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="bi bi-link-45deg"></i></div>
+                        <div>
+                            <div class="detail-label">Content Link</div>
+                            <div class="detail-value">
+                                <a href="{{ article.link }}" target="_blank"
+                                   style="color:var(--teal);word-break:break-all;">
+                                    {{ article.link }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex gap-2 mt-4">
+                    <a href="{{ path('article_edit', {id: article.id}) }}"
+                       class="btn btn-teal fw-semibold flex-fill">
+                        <i class="bi bi-pencil me-2"></i>Edit
+                    </a>
+                    <a href="{{ path('article_index') }}"
+                       class="btn btn-outline-secondary fw-semibold flex-fill">
+                        <i class="bi bi-arrow-left me-2"></i>Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

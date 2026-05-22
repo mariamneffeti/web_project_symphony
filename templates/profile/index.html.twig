@@ -1,0 +1,480 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}
+    {% if user.role == 'employee' %}Employee Profile
+    {% elseif user.role == 'normal' %}User Profile
+    {% else %}Company Profile{% endif %}
+{% endblock %}
+
+{% block page_title %}Profile{% endblock %}
+{% set active_page = '' %}
+
+{% block stylesheets %}
+    <style>
+        /* ── Page animation ──────────────────────────────────────── */
+        .profile-wrapper {
+            animation: fadeUp .45s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Left card ───────────────────────────────────────────── */
+        .profile-banner {
+            background: linear-gradient(135deg, var(--forest) 0%, var(--teal) 100%);
+            height: 140px;
+            border-radius: var(--radius) var(--radius) 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative circles on banner */
+        .profile-banner::before,
+        .profile-banner::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,.07);
+        }
+
+        .profile-banner::before {
+            width: 180px; height: 180px;
+            top: -60px; right: -40px;
+        }
+
+        .profile-banner::after {
+            width: 100px; height: 100px;
+            bottom: -30px; left: 20px;
+        }
+
+        /* ── Avatar ──────────────────────────────────────────────── */
+        .avatar-wrap {
+            margin-top: -70px;
+            display: inline-block;
+            padding: 5px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 16px rgba(0,0,0,.15);
+            position: relative;
+        }
+
+        .avatar-img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+
+        /* ── Role badge ──────────────────────────────────────────── */
+        .role-badge {
+            display: inline-block;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            border-radius: 20px;
+            padding: .3em 1em;
+        }
+
+        .role-employee { background: #dbeafe; color: #1d4ed8; }
+        .role-company  { background: #d1fae5; color: #065f46; }
+        .role-normal   { background: rgba(56,128,135,.12); color: var(--teal); }
+
+        /* ── Meta rows ───────────────────────────────────────────── */
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .7rem 0;
+            border-bottom: 1px solid #f0f2f4;
+        }
+
+        .meta-row:last-child { border-bottom: none; }
+
+        .meta-icon {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            background: rgba(56,128,135,.1);
+            color: var(--teal);
+            display: flex; align-items: center; justify-content: center;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .meta-label {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #9ba4ac;
+            font-weight: 600;
+            margin-bottom: 1px;
+        }
+
+        .meta-value {
+            font-weight: 500;
+            font-size: .875rem;
+            color: #1a1a1a;
+            word-break: break-all;
+        }
+
+        /* ── Right card / form ───────────────────────────────────── */
+        .settings-card {
+            border-left: 4px solid var(--teal) !important;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px; height: 1.2em;
+            background: var(--teal);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .form-label { font-weight: 600; font-size: .855rem; color: var(--navy); }
+
+        /* ── Password reveal toggle ──────────────────────────────── */
+        .pw-wrap { position: relative; }
+
+        .pw-wrap .pw-toggle {
+            position: absolute;
+            top: 50%; right: .85rem;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9ba4ac;
+            font-size: 1rem;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .pw-wrap .pw-toggle:hover { color: var(--teal); }
+        .pw-wrap input { padding-right: 2.5rem; }
+
+        /* ── Image preview ────────────────────────────────────────── */
+        #imagePreviewWrap {
+            display: none;
+            margin-top: .5rem;
+        }
+
+        #imagePreview {
+            width: 72px; height: 72px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--teal);
+        }
+
+        /* ── Save button ─────────────────────────────────────────── */
+        .btn-save {
+            background: var(--teal);
+            color: white;
+            border: none;
+            font-weight: 600;
+            letter-spacing: .02em;
+            transition: background .2s, transform .15s;
+            padding: .7rem 2.5rem;
+            border-radius: 8px;
+        }
+
+        .btn-save:hover { background: var(--teal-dark); color: white; transform: translateY(-1px); }
+
+        /* ── Toast ───────────────────────────────────────────────── */
+        #toast-container {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast-msg {
+            padding: .75rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: .875rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,.18);
+            animation: toastIn .3s ease;
+            min-width: 260px;
+        }
+
+        .toast-success { background: #d1f5e4; color: #1a7a4a; border-left: 4px solid #2bb569; }
+        .toast-error   { background: #fde8e8; color: #b91c1c; border-left: 4px solid #ef4444; }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <main class="container page-content">
+        <div class="row profile-wrapper g-4">
+
+            {# ── LEFT — avatar card ────────────────────────────────────── #}
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+
+                    <div class="profile-banner"></div>
+
+                    <div class="card-body text-center px-4">
+
+                        {# Avatar #}
+                        <div class="avatar-wrap">
+                            <img id="avatarDisplay"
+                                 src="{{ user.image ? asset('uploads/' ~ user.image) : asset('images/profile.png') }}"
+                                 alt="Avatar"
+                                 class="avatar-img">
+                        </div>
+
+                        {# Name + role #}
+                        <h4 class="fw-bold mt-3 mb-1" style="font-family:'Syne',sans-serif;">
+                            {{ user.firstName }} {{ user.lastName }}
+                        </h4>
+
+                        <span class="role-badge role-{{ user.role }} mb-3 d-inline-block">
+                    {{ user.role|capitalize }}
+                </span>
+
+                        <hr class="opacity-15 my-3">
+
+                        {# Meta rows #}
+                        <div class="text-start">
+                            <div class="meta-row">
+                                <div class="meta-icon"><i class="bi bi-envelope"></i></div>
+                                <div>
+                                    <div class="meta-label">Email</div>
+                                    <div class="meta-value">{{ user.email }}</div>
+                                </div>
+                            </div>
+                            <div class="meta-row">
+                                <div class="meta-icon"><i class="bi bi-shield-check"></i></div>
+                                <div>
+                                    <div class="meta-label">Role</div>
+                                    <div class="meta-value">{{ user.role|capitalize }}</div>
+                                </div>
+                            </div>
+                            <div class="meta-row">
+                                <div class="meta-icon"><i class="bi bi-circle-fill" style="font-size:.45rem;color:#2bb569;"></i></div>
+                                <div>
+                                    <div class="meta-label">Status</div>
+                                    <div class="meta-value">
+                                <span style="background:#d1fae5;color:#065f46;padding:.2em .75em;border-radius:20px;font-size:.75rem;font-weight:600;">
+                                    Active
+                                </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            {# ── RIGHT — settings form ─────────────────────────────────── #}
+            <div class="col-lg-8">
+                <div class="card shadow-sm p-4 h-100 settings-card">
+
+                    <h3 class="section-title mb-4">Account Settings</h3>
+
+                    {# Flash messages inline #}
+                    {% for type, msgs in app.flashes %}
+                        {% for msg in msgs %}
+                            <div class="alert alert-{{ type == 'success' ? 'success' : 'danger' }} alert-dismissible fade show mb-3" role="alert">
+                                <i class="bi bi-{{ type == 'success' ? 'check-circle' : 'exclamation-triangle' }} me-2"></i>
+                                {{ msg }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {{ form_start(form, {
+                        'attr': {
+                            'id': 'profileForm',
+                            'enctype': 'multipart/form-data',
+                            'novalidate': 'novalidate'
+                        },
+                        'action': path('profile_index'),
+                        'method': 'POST'
+                    }) }}
+
+                    <div class="row g-3">
+
+                        {# Name #}
+                        <div class="col-md-6">
+                            {{ form_label(form.firstName) }}
+                            {{ form_widget(form.firstName) }}
+                            {{ form_errors(form.firstName) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(form.lastName) }}
+                            {{ form_widget(form.lastName) }}
+                            {{ form_errors(form.lastName) }}
+                        </div>
+
+                        {# Email #}
+                        <div class="col-12">
+                            {{ form_label(form.email) }}
+                            {{ form_widget(form.email) }}
+                            {{ form_errors(form.email) }}
+                        </div>
+
+                        {# Role #}
+                        <div class="col-12">
+                            {{ form_label(form.role) }}
+                            {{ form_widget(form.role) }}
+                            {{ form_errors(form.role) }}
+                        </div>
+
+                        {# Divider #}
+                        <div class="col-12">
+                            <hr class="opacity-15">
+                            <p class="small text-muted mb-0">
+                                <i class="bi bi-lock me-1"></i>
+                                Leave password fields blank to keep your current password.
+                            </p>
+                        </div>
+
+                        {# Password #}
+                        <div class="col-md-6">
+                            {{ form_label(form.plainPassword.first) }}
+                            <div class="pw-wrap">
+                                {{ form_widget(form.plainPassword.first, {'attr': {'id': 'pw1'}}) }}
+                                <button type="button" class="pw-toggle" onclick="togglePw('pw1', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {{ form_errors(form.plainPassword.first) }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form_label(form.plainPassword.second) }}
+                            <div class="pw-wrap">
+                                {{ form_widget(form.plainPassword.second, {'attr': {'id': 'pw2'}}) }}
+                                <button type="button" class="pw-toggle" onclick="togglePw('pw2', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {{ form_errors(form.plainPassword.second) }}
+                        </div>
+
+                        {# Image upload #}
+                        <div class="col-md-6">
+                            {{ form_label(form.imageFile) }}
+                            {{ form_widget(form.imageFile, {'attr': {'id': 'imageFileInput'}}) }}
+                            {{ form_errors(form.imageFile) }}
+                            <div id="imagePreviewWrap">
+                                <img id="imagePreview" src="" alt="Preview">
+                                <span class="ms-2 small text-muted">Preview</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {# Actions #}
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top border-light">
+                        <a href="{{ path('employee_index') }}"
+                           class="btn btn-outline-secondary fw-semibold px-4">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn-save">
+                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="toast-container"></div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        /* ── Password toggle ─────────────────────────────────────── */
+        function togglePw(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon  = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
+        /* ── Image preview + live avatar update ──────────────────── */
+        document.getElementById('imageFileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Small preview below the input
+                const wrap    = document.getElementById('imagePreviewWrap');
+                const preview = document.getElementById('imagePreview');
+                preview.src   = e.target.result;
+                wrap.style.display = 'flex';
+                wrap.style.alignItems = 'center';
+
+                // Live update the avatar in the left card
+                document.getElementById('avatarDisplay').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        /* ── Live name update in left card ───────────────────────── */
+        function liveUpdate(selector, targets) {
+            const el = document.querySelector(selector);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                const fn = document.querySelector('[name$="[firstName]"]')?.value ?? '';
+                const ln = document.querySelector('[name$="[lastName]"]')?.value  ?? '';
+                targets.forEach(t => {
+                    const node = document.querySelector(t);
+                    if (node) node.textContent = (fn + ' ' + ln).trim();
+                });
+            });
+        }
+
+        liveUpdate('[name$="[firstName]"]', ['h4.fw-bold']);
+        liveUpdate('[name$="[lastName]"]',  ['h4.fw-bold']);
+
+        /* ── Toast helper (for flash-free AJAX if needed later) ──── */
+        function toast(msg, type = 'success') {
+            const c  = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `toast-msg toast-${type}`;
+            el.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>${msg}`;
+            c.appendChild(el);
+            setTimeout(() => el.remove(), 3500);
+        }
+
+        /* ── Auto-dismiss flash alerts after 4 s ─────────────────── */
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert.close();
+            }, 4000);
+        });
+    </script>
+{% endblock %}

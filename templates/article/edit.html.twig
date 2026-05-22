@@ -1,0 +1,133 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Edit Article{% endblock %}
+{% block page_title %}Articles{% endblock %}
+{% set active_page = 'Articles' %}
+
+{% block stylesheets %}
+    <style>
+        .edit-card {
+            max-width: 780px;
+            margin: 0 auto;
+            animation: fadeUp .4s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .edit-header {
+            background: linear-gradient(135deg, var(--navy), var(--teal));
+            border-radius: var(--radius) var(--radius) 0 0;
+            padding: 1.75rem 2rem;
+            color: white;
+        }
+
+        .edit-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .edit-body { padding: 2rem; }
+
+        .form-label { font-weight: 600; font-size: .875rem; color: var(--navy); }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <main class="container page-content">
+        <div class="edit-card card shadow-sm">
+
+            <div class="edit-header d-flex align-items-center gap-3">
+                <div style="background:rgba(255,255,255,.15);width:44px;height:44px;border-radius:10px;
+                    display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+                    <i class="bi bi-newspaper"></i>
+                </div>
+                <div>
+                    <h2>Edit Article</h2>
+                    <p class="mb-0 opacity-75 small">ID #{{ article.id }} — {{ article.title }}</p>
+                </div>
+            </div>
+
+            <div class="edit-body">
+                {{ form_start(form, {
+                    'attr': {'id': 'editForm', 'novalidate': 'novalidate'},
+                    'action': path('article_edit', {id: article.id}),
+                    'method': 'POST'
+                }) }}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form_label(form.title) }}
+                        {{ form_widget(form.title) }}
+                        {{ form_errors(form.title) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.category) }}
+                        {{ form_widget(form.category) }}
+                        {{ form_errors(form.category) }}
+                    </div>
+                    <div class="col-12">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.authorName) }}
+                        {{ form_widget(form.authorName) }}
+                        {{ form_errors(form.authorName) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.arDate) }}
+                        {{ form_widget(form.arDate) }}
+                        {{ form_errors(form.arDate) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.link) }}
+                        {{ form_widget(form.link) }}
+                        {{ form_errors(form.link) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.arImage) }}
+                        {{ form_widget(form.arImage) }}
+                        {{ form_errors(form.arImage) }}
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-teal fw-semibold px-4">
+                        <i class="bi bi-check-circle me-2"></i>Save Changes
+                    </button>
+                    <a href="{{ path('article_index') }}" class="btn btn-outline-secondary fw-semibold px-4">
+                        <i class="bi bi-arrow-left me-2"></i>Cancel
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const res  = await fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const json = await res.json();
+
+            if (json.status === 'success') {
+                window.location.href = '{{ path("article_index") }}';
+            } else {
+                alert(json.message || 'Update failed.');
+            }
+        });
+    </script>
+{% endblock %}
