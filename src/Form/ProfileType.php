@@ -53,9 +53,14 @@ class ProfileType extends AbstractType
                 'first_options'   => [
                     'label' => 'New Password',
                     'attr'  => ['class' => 'form-control', 'placeholder' => '••••••••'],
-                    'constraints' => [new Length(['min' => 6, 'minMessage' => 'Password must be at least 6 characters.'])],
+                    'constraints' => [
+                        new Length([
+                            'min'        => 6,
+                            'minMessage' => 'Password must be at least 6 characters.',
+                        ]),
+                    ],
                 ],
-                'second_options'  => [
+                'second_options' => [
                     'label' => 'Confirm Password',
                     'attr'  => ['class' => 'form-control', 'placeholder' => '••••••••'],
                 ],
@@ -65,13 +70,17 @@ class ProfileType extends AbstractType
                 'label'    => 'Profile Image',
                 'mapped'   => false,
                 'required' => false,
-                'attr'     => ['class' => 'form-control', 'accept' => 'image/jpeg,image/png,image/webp'],
+                'attr'     => [
+                    'class'  => 'form-control',
+                    'accept' => 'image/jpeg,image/png,image/webp',
+                    'id'     => 'imageFileInput',
+                ],
                 'constraints' => [
                     new File([
                         'maxSize'          => '2M',
                         'mimeTypes'        => ['image/jpeg', 'image/png', 'image/webp'],
                         'mimeTypesMessage' => 'Please upload a valid image (JPG, PNG, WEBP).',
-                        'maxSizeMessage'   => 'Image is too large (max 2MB).',
+                        'maxSizeMessage'   => 'Image too large (max 2MB).',
                     ]),
                 ],
             ]);
@@ -79,6 +88,9 @@ class ProfileType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => User::class]);
+        $resolver->setDefaults([
+            'data_class'      => User::class,
+            'csrf_protection' => false,
+        ]);
     }
 }

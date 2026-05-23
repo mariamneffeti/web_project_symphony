@@ -19,21 +19,25 @@ class ProfileController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET', 'POST'])]
     public function index(
-        Request $request,
-        EntityManagerInterface $em,
+        Request                     $request,
+        EntityManagerInterface      $em,
         UserPasswordHasherInterface $hasher,
-        SluggerInterface $slugger,
-        UserRepository $userRepo
+        SluggerInterface            $slugger,
+        UserRepository              $userRepo
     ): Response {
+
+        // Récupérer l'utilisateur (temporaire — remplacer par $this->getUser() avec auth)
         $user = $userRepo->find(1);
 
         if (!$user) {
-            $user = new \App\Entity\User();
+            $user = new User();
             $user->setFirstName('Admin');
             $user->setLastName('User');
             $user->setEmail('admin@entreprisa.com');
             $user->setRole('company');
             $user->setPassword('temp');
+            $em->persist($user);
+            $em->flush();
         }
 
         $form = $this->createForm(ProfileType::class, $user);
@@ -41,23 +45,28 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            // ── Mot de passe ────────────────────────────────────
             $plainPassword = $form->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $user->setPassword($hasher->hashPassword($user, $plainPassword));
             }
 
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile */
+            // ── Upload image ────────────────────────────────────
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
                 $safeFilename = $slugger->slug($user->getFirstName() . '-' . $user->getLastName());
                 $newFilename  = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
                 try {
-                    $imageFile->move(
-                        $this->getParameter('uploads_directory'),
-                        $newFilename
-                    );
+                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
+
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
+                    }
+
+                    $imageFile->move($uploadDir, $newFilename);
                     $user->setImage($newFilename);
+
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Image upload failed: ' . $e->getMessage());
                     return $this->redirectToRoute('profile_index');
@@ -65,7 +74,6 @@ class ProfileController extends AbstractController
             }
 
             $em->flush();
-
             $this->addFlash('success', 'Profile updated successfully.');
             return $this->redirectToRoute('profile_index');
         }
