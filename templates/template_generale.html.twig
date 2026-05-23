@@ -13,6 +13,8 @@
 
     {# Base styles — always loaded on every page #}
     <style>
+
+
         :root {
             --primary-teal: #388087;
             --dark-forest: #0d1f1b;
@@ -26,7 +28,7 @@
             color: #111;
         }
 
-           /* ── NAVBAR ── */
+        {#   /* ── NAVBAR ── */
         .custom-navbar { background: linear-gradient(90deg, #388087, #0d1f1b); }
         .dropdown-toggle::after { display: none !important; }
         .dropdown-menu { border-radius: 8px; padding: 8px 0; background-color: #212529; }
@@ -63,7 +65,7 @@
             z-index: 999;
             transition: background 0.2s;
         }
-        #backToTop:hover { background: #0a1e30; } }
+        #backToTop:hover { background: #0a1e30; } #}
     </style>
 
     {# Child pages add their own <style> tags here #}
@@ -71,7 +73,7 @@
 </head>
 <body>
 
- {#  ══ NAVBAR ══ #}
+{# ══ NAVBAR ══
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark custom-navbar">
     <div class="container-fluid">
         <button class="navbar-toggler me-2" type="button"
@@ -101,17 +103,11 @@
                style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">
                 Register
             </a>
-            <div class="navbar-nav ms-auto d-flex flex-row gap-2 align-items-center">
-                <button id="themeToggle" class="nav-link text-white">🌙 Dark Mode</button>
-            </div>
         </div>
-
     </div>
-
-
 </nav>
 
-{# ══ OFFCANVAS SIDEBAR ══ #}
+ ══ OFFCANVAS SIDEBAR ══
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar"
      style="background-color:#0d1f1b;color:white;">
     <div class="offcanvas-header border-bottom border-secondary">
@@ -147,12 +143,12 @@
             </li>
         </ul>
     </div>
-</div>
+</div> #}
 
 {# ══ PAGE CONTENT ══ #}
-{% block body %}{% endblock %}
+{% block body %}  {% endblock %}
 
- {# ══ FOOTER ══ #}
+{# ══ FOOTER ══
 <footer class="footer-forest text-white py-5" id="contact">
     <div class="container" style="margin-top:5rem;">
         <div class="row gy-4">
@@ -208,7 +204,7 @@
 </footer>
 
 <button id="backToTop">⇧ Top</button>
-
+#}
 <script>
     const btn = document.getElementById("backToTop");
     window.addEventListener("scroll", () => {
@@ -217,7 +213,30 @@
     btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 </script>
 
-{% block javascripts %}{% endblock %}
+{% block javascripts %}
+
+        <script>
+            const toggle = document.getElementById('themeToggle');
+
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                toggle.textContent = '☀️ Light Mode';
+            }
+
+            toggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+
+                if (document.body.classList.contains('dark-mode')) {
+                    toggle.textContent = '☀️ Light Mode';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    toggle.textContent = '🌙 Dark Mode';
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        </script>
+
+{% endblock %}
 
 </body>
 </html>
