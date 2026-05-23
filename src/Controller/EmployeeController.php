@@ -15,9 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/employees', name: 'employee_')]
 class EmployeeController extends AbstractController
 {
-    // ─────────────────────────────────────────────────────────────────
-    //  LIST + ADD (main RH page)
-    // ─────────────────────────────────────────────────────────────────
     #[Route('', name: 'index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,

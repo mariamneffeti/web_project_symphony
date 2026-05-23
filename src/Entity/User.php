@@ -26,7 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $role = null;   // 'employee' | 'normal' | 'company'
+    private ?string $role = null;
 
     #[ORM\Column]
     private ?string $password = null;
@@ -47,7 +47,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ── UserInterface ───────────────────────────────────────────────
 
     public function getRoles(): array
     {
@@ -61,7 +60,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string { return (string) $this->email; }
     public function eraseCredentials(): void {}
 
-    // ── Getters / Setters ───────────────────────────────────────────
 
     public function getId(): ?int { return $this->id; }
 
