@@ -235,6 +235,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto gap-2">
                 {% set nav = [
+                    ['Profile',       'profile_index'],
                     ['Home',          'employee_index'],
                     ['Employees',     'employee_index'],
                     ['Clients',       'employee_index'],
@@ -242,7 +243,7 @@
                     ['Stock',         'employee_index'],
                     ['Sales',         'employee_index'],
                     ['Management',    'employee_index'],
-                    ['Articles',      'employee_index'],
+                    ['Articles',      'article_index'],
                     ['Finance',       'employee_index'],
                 ] %}
                 {% for item in nav %}
@@ -263,7 +264,7 @@
                     <span class="d-none d-sm-inline">Admin</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li><a class="dropdown-item" href="#">
+                    <li><a class="dropdown-item" href="{{ path('profile_index') }}">
                             <i class="bi bi-person me-2"></i> Profil</a></li>
                     <li><hr class="dropdown-divider border-secondary"></li>
                     <li><a class="dropdown-item text-danger" href="#">
@@ -289,7 +290,8 @@
                 ['bi-box-seam',     'Stock',      'employee_index'],
                 ['bi-cart',         'Sales',      'employee_index'],
                 ['bi-calendar-check','Management','employee_index'],
-                ['bi-newspaper',    'Articles',   'employee_index'],
+                ['bi-person',    'Profile',    'profile_index'],
+                ['bi-newspaper',    'Articles',   'article_index'],
                 ['bi-cash-stack',   'Finance',    'employee_index'],
             ] %}
             {% for item in sidebar %}

@@ -75,9 +75,6 @@ class EmployeeController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  VIEW
-    // ─────────────────────────────────────────────────────────────────
     #[Route('/{id}', name: 'view', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function view(Employee $employee): Response
     {
@@ -86,9 +83,6 @@ class EmployeeController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  EDIT
-    // ─────────────────────────────────────────────────────────────────
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, Employee $employee, EntityManagerInterface $em): Response
     {
@@ -111,10 +105,6 @@ class EmployeeController extends AbstractController
             'employee' => $employee,
         ]);
     }
-
-    // ─────────────────────────────────────────────────────────────────
-    //  DELETE (POST / AJAX)
-    // ─────────────────────────────────────────────────────────────────
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Employee $employee, EntityManagerInterface $em): JsonResponse
     {

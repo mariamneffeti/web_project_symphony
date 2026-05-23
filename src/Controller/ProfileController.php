@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\ProfileType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -17,27 +19,33 @@ class ProfileController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET', 'POST'])]
     public function index(
-        Request                     $request,
-        EntityManagerInterface      $em,
+        Request $request,
+        EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher,
-        SluggerInterface            $slugger
+        SluggerInterface $slugger,
+        UserRepository $userRepo
     ): Response {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $userRepo->find(1);
 
-        /** @var \App\Entity\User $user */
-        $user = $this->getUser();
+        if (!$user) {
+            $user = new \App\Entity\User();
+            $user->setFirstName('Admin');
+            $user->setLastName('User');
+            $user->setEmail('admin@entreprisa.com');
+            $user->setRole('company');
+            $user->setPassword('temp');
+        }
+
         $form = $this->createForm(ProfileType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // ── Password ────────────────────────────────────────────
             $plainPassword = $form->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $user->setPassword($hasher->hashPassword($user, $plainPassword));
             }
 
-            // ── Image upload ────────────────────────────────────────
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile */
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
