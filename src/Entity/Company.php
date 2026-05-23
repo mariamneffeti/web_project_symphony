@@ -17,7 +17,6 @@ class Company
     #[ORM\Column]
     private ?int $id = null;
 
-    // 🔥 user_id (ONE TO ONE)
     #[ORM\OneToOne(inversedBy: 'company')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
@@ -34,25 +33,12 @@ class Company
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $phone = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-    private ?\DateTimeImmutable $updatedAt = null;
-
-    #[ORM\PreUpdate]
-    public function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
-    }
-
-    // 🔥 ONE COMPANY → MANY EXPENSES
     #[ORM\OneToMany(mappedBy: 'company', targetEntity: Expense::class)]
     private Collection $expenses;
 
     public function __construct()
     {
         $this->expenses = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

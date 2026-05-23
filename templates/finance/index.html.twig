@@ -1,0 +1,220 @@
+{% extends 'baseCompany.html.twig' %}
+
+{% block title %}Finance{% endblock %}
+
+{% block stylesheet %}<link rel="stylesheet" href="{{ asset('css/finance.css') }}">{% endblock %}
+
+{% block page_title %}Finance Dashboard{% endblock %}
+
+{% block body %}
+
+<div class="container py-4" style="margin-top: 100px; margin-bottom: 100px;">
+
+    <section id="summary" class="mb-5">
+        <h2 class="h4 mb-4 fw-bold" style="color: #102E4A;">Financial Summary</h2>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <div class="card p-4 text-center stats-card">
+                    <h6 class="text-secondary text-uppercase small">Total Revenue</h6>
+                    <h3 class="fw-bold" id="revenue-kpi">0 Dt</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-4 text-center stats-card" style="border-left-color: #102E4A;">
+                    <h6 class="text-secondary text-uppercase small">Total Expenses</h6>
+                    <h3 class="fw-bold" id="expenses-kpi">0 Dt</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-4 text-center stats-card">
+                    <h6 class="text-secondary text-uppercase small">Net Profit</h6>
+                    <h3 class="fw-bold" id="net-profit-kpi">0 Dt</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-4 text-center stats-card" style="border-left-color: #8D9B6A;">
+                    <h6 class="text-secondary text-uppercase small">Sales count</h6>
+                    <h3 class="fw-bold" id="salecnt-kpi">0</h3>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="analytics" class="mb-5">
+        <div class="card border-0 shadow-sm p-4 rounded-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 fw-bold" style="color: #102E4A;">Financial Analytics</h2>
+
+                <select id="yearFilter" class="form-select w-auto">
+
+                    {% for i in 0..5 %}
+                        <option value="{{ "now"|date("Y") - i }}">
+                            {{ "now"|date("Y") - i }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div style="position: relative; height:300px; width:100%;">
+                <canvas id="financeChart"></canvas>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="add-transaction" class="mb-5">
+        <div class="card border-0 shadow-sm p-4 rounded-4">
+
+            <h2 class="h4 mb-4 fw-bold" style="color: #102E4A;">Add Transaction</h2>
+
+            <form id="transaction-form" method="POST" class="row g-3">
+
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Date</label>
+                    <input type="date" name="date" class="form-control" required>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Type</label>
+                    <select name="type" class="form-select" required>
+                        <option value="Salary">Salary</option>
+                        <option value="Supply">Supply</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Tools">Tools</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Amount</label>
+                    <input type="number" name="amount" class="form-control" step="0.01" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Description</label>
+                    <input type="text" name="description" class="form-control">
+                </div>
+
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-finance px-5 py-2 rounded-pill mt-3">
+                        <i class="bi bi-plus-circle me-2"></i>Add Transaction
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </section>
+
+    <section id="transactions" class="mb-5">
+
+        <h2 class="h4 mb-4 fw-bold" style="color: #102E4A;">Recent Transactions</h2>
+        <div class="card border-0 shadow-sm p-3 mb-4 bg-light rounded-4">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-2">
+                    <select id="filter-type" class="form-select form-select-sm">
+                        <option value="all">All Types</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Supply">Supply</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Tools">Tools</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <input type="date" id="filter-date-start" class="form-control form-control-sm">
+                </div>
+
+                <div class="col-md-2">
+                    <input type="date" id="filter-date-end" class="form-control form-control-sm">
+                </div>
+
+                <div class="col-md-4 text-end">
+                    <button id="reset-filters" class="btn btn-outline-secondary btn-sm rounded-pill">
+                        Reset
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="table-responsive shadow-sm rounded-3">
+
+            <table class="table table-hover table-custom align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+
+                <tbody id="transaction-list">
+
+                    {% for expense in expenses %}
+
+                        {% set badgeClass =
+                            expense.category == 'Rent' ? 'badge-rent' :
+                            expense.category == 'Salary' ? 'badge-salary' :
+                            expense.category == 'Tools' ? 'badge-tools' :
+                            expense.category == 'Marketing' ? 'badge-marketing' :
+                            expense.category == 'Supply' ? 'badge-supplies' :
+                            'badge-other'
+                        %}
+
+                        <tr>
+                            <td>{{ expense.expenseDate|date('Y-m-d') }}</td>
+
+                            <td>
+                                <span class="badge {{ badgeClass }}">
+                                    {{ expense.category }}
+                                </span>
+                            </td>
+
+                            <td class="fw-bold">
+                                {{ expense.amount }} Dt
+                            </td>
+
+                            <td>
+                                {{ expense.description }}
+                            </td>
+                        </tr>
+
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                No transactions found
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+        <div class="text-center my-4">
+            <button id="show-more-expenses" class="btn btn-outline-primary rounded-pill px-5">
+                Show More
+            </button>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}<script src="{{ asset('js/finance.js') }}"></script>{% endblock %}

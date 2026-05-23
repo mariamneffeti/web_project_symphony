@@ -1,0 +1,128 @@
+{% extends 'template_generale.html.twig' %}
+
+{% block title %}Hello RegistrationController!{% endblock %}
+
+{% block body %}
+    <style>
+        .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+        .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    </style>
+
+
+
+    {% block stylesheets %}
+        <style>
+            :root {
+                --blue: #102E4A;
+                --bluegreen: #388087;
+                --gris: #F6F6F2;
+                --black: #000000;
+            }
+
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+
+            body {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: var(--gris);
+                font-family: Arial, sans-serif;
+                color: #46462A;
+            }
+
+            .container {
+                background-color: white;
+                padding: 30px;
+                width: 360px;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            }
+
+            h2 { text-align: center; margin-bottom: 20px; }
+
+            input, select {
+                width: 100%;
+                padding: 12px;
+                margin: 8px 0;
+                border-radius: 6px;
+                border: 1px solid var(--black);
+                background: transparent;
+                color: var(--blue);
+                font-size: 14px;
+            }
+
+            input::placeholder { color: var(--blue); opacity: 0.7; }
+
+            input:focus, select:focus {
+                outline: none;
+                border-color: var(--blue);
+                box-shadow: 0 0 5px rgba(16, 46, 74, 0.5);
+            }
+
+            button {
+                width: 100%;
+                margin-top: 15px;
+                padding: 12px;
+                background-color: var(--bluegreen);
+                color: var(--gris);
+                border: none;
+                border-radius: 6px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            button:hover { background-color: var(--blue); }
+
+            .login-link { text-align: center; margin-top: 15px; font-size: 14px; }
+
+            .login-link a { color: var(--blue); text-decoration: none; font-weight: bold; }
+
+            .login-link a:hover { text-decoration: underline; }
+        </style>
+    {% endblock %}
+    <div class="container">
+    <h2>Create Account</h2>
+    {{ form_start(registrationForm) }}
+
+    {{ form_row(registrationForm.firstName) }}
+    {{ form_row(registrationForm.lastName) }}
+    {{ form_row(registrationForm.email) }}
+    {{ form_row(registrationForm.role) }}
+    {{ form_row(registrationForm.plainPassword.first) }}
+    {{ form_row(registrationForm.plainPassword.second) }}
+
+    <div id="company-fields" style="display:none;">
+        {{ form_row(registrationForm.companyName) }}
+        {{ form_row(registrationForm.industry) }}
+        {{ form_row(registrationForm.address) }}
+        {{ form_row(registrationForm.phone) }}
+    </div>
+
+    <button type="submit">Register</button>
+
+    {{ form_end(registrationForm) }}
+    </div>
+    <script>
+        const roleSelect = document.querySelector('select[name="registration_form[role]"]');
+        const companyFields = document.getElementById('company-fields');
+        const inputs = companyFields.getElementsByTagName('input');
+
+        function toggleCompany() {
+            if (roleSelect.value === 'company') {
+                companyFields.style.display = 'block';
+                for (let i of inputs) i.required = true;
+            } else {
+                companyFields.style.display = 'none';
+                for (let i of inputs) i.required = false;
+            }
+        }
+        toggleCompany();
+        roleSelect.addEventListener('change', toggleCompany);
+    </script>
+
+
+
+
+{% endblock %}

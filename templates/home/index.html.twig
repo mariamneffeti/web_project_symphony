@@ -1,0 +1,311 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Entreprisa – Home{% endblock %}
+
+{% block nav_home %}active{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+
+        {# Dark Mode style #}
+        body.dark-mode {
+            background-color: #1a1a2e !important;
+            color: #f0f0f0 !important;
+        }
+        body.dark-mode .custom-navbar {
+            background: linear-gradient(90deg, #0d1f1b, #1a1a2e) !important;
+        }
+        body.dark-mode .footer-forest {
+            background: linear-gradient(180deg, #0d1f1b 0%, #1a1a2e 100%) !important;
+        }
+
+        /* ── HERO ── */
+        .hero-section {
+            width: 100%;
+            height: 700px;
+            position: relative;
+        }
+        .hero-animated-overlay {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 700px;
+            z-index: 1;
+            animation: pulseOverlay 8s ease-in-out infinite;
+        }
+        @keyframes pulseOverlay {
+            0%   { background-color: rgba(42,41,41,0.3); }
+            50%  { background-color: rgba(0,0,0,0.5); }
+            100% { background-color: rgba(42,41,41,0.3); }
+        }
+        .hero-info { padding-top: 15rem; }
+        .hero-info h1 {
+            font-size: 55px;
+            color: #F6F6F2;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            line-height: 1.15;
+        }
+        .hero-info h2 {
+            color: #F6F6F2;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            padding-top: 1rem;
+            opacity: 0.9;
+        }
+        .btn-hero {
+            color: #F6F6F2;
+            border: 1px solid #F6F6F2;
+            background: transparent;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-hero:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+        /* ── SERVICES ── */
+        #services { background-color: var(--bg-light) !important; padding: 80px 20px; }
+        .section-label {
+            color: var(--primary-teal);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .section-title {
+            color: var(--accent-blue);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+        }
+        .service-card-wrap {
+            background: #fff; border: 1px solid #ecf1ec; border-radius: 12px;
+            overflow: hidden; height: 100%; display: flex; flex-direction: column;
+            opacity: 0; transform: translateY(24px);
+            transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.25s ease;
+        }
+        .service-card-wrap.show { opacity: 1; transform: translateY(0); }
+        .service-card-wrap:hover {
+            transform: translateY(-6px) !important;
+            box-shadow: 0 12px 28px rgba(56,128,135,0.18);
+        }
+        .service-card-img { width: 100%; height: 190px; object-fit: cover; display: block; }
+        .service-card-body { padding: 1.4rem 1.5rem 1.6rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .service-badge {
+            background: #e8f4f5; color: var(--primary-teal);
+            font-size: 0.72rem; font-family: 'Roboto Mono', monospace;
+            padding: 3px 10px; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .service-card-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: #e8f4f5; color: var(--primary-teal);
+            display: flex; align-items: center; justify-content: center; font-size: 1rem;
+        }
+        .service-card-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1rem; color: #111; margin-bottom: 0.35rem; }
+        .service-card-desc { font-size: 0.85rem; color: #555; margin-bottom: 0.85rem; }
+        .service-card-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+        .service-card-list li {
+            font-size: 0.82rem; color: #444; padding: 5px 0;
+            border-top: 1px solid #f0f0f0; display: flex; align-items: center; gap: 7px;
+        }
+        .service-card-list li::before {
+            content: ''; width: 6px; height: 6px;
+            border-radius: 50%; background: var(--primary-teal); flex-shrink: 0;
+        }
+        .card-footer-row {
+            display: flex; justify-content: flex-end; align-items: center;
+            border-top: 1px solid #f0f0f0; padding-top: 0.75rem; margin-top: 0.85rem;
+        }
+        .card-read-more { font-size: 0.82rem; font-weight: 700; color: var(--primary-teal); text-decoration: none; }
+        .card-read-more:hover { color: var(--accent-blue); }
+
+        /* ── CAPABILITIES ── */
+        .capabilities-section { background-color: #111e1c !important; color: white; }
+        .capabilities-section h6,
+        .capabilities-section h2,
+        .capabilities-section h4,
+        .capabilities-section p { color: white !important; }
+
+        /* ── HIGHLIGHT ── */
+        .highlight { animation: highlightAnim 1s ease; }
+        @keyframes highlightAnim {
+            0%   { background-color: transparent; }
+            30%  { background-color: rgba(56,128,135,0.15); }
+            100% { background-color: transparent; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    {# ══ HERO ══ #}
+    <section class="hero-section" style="margin-top:56px; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80') no-repeat center / cover;">
+        <div class="hero-animated-overlay">
+            <div class="container">
+                <div class="hero-info">
+                    <h1>Where great<br>partnerships begin</h1>
+                    <h2>We connect companies, employees &amp; clients<br>in one unified platform.</h2>
+                    <div class="row mb-3 pt-3">
+                        <div class="col-auto">
+                            <a href="{{ path('app_login') }}" class="btn btn-hero btn-lg px-4">Login</a>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{{ path('app_registration') }}" class="btn btn-hero btn-lg px-4">Register</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ══ SERVICES ══ #}
+    <section id="services" class="py-5">
+        <div class="container text-center">
+            <p class="section-label mb-2">What we offer</p>
+            <h2 class="section-title mb-5">Our Services</h2>
+            <div class="row g-4">
+
+                <div class="col-md-4">
+                    <div class="service-card-wrap">
+                        <img src="{{ asset('images/one.jpg') }}" alt="Company Services" class="service-card-img" />
+                        <div class="service-card-body">
+                            <div class="card-top-row">
+                                <span class="service-badge">Enterprise</span>
+                                <div class="service-card-icon"><i class="bi bi-building"></i></div>
+                            </div>
+                            <h5 class="service-card-title">Company Services</h5>
+                            <p class="service-card-desc">End-to-end tools to run and scale your organisation — from HR to sales pipelines.</p>
+                            <ul class="service-card-list">
+                                <li>Clients &amp; Employees Management</li>
+                                <li>Sales Management</li>
+                                <li>Recruitment</li>
+                            </ul>
+                            <div class="card-footer-row">
+                                <a href="#" class="card-read-more">Get started <i class="bi bi-arrow-up-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="service-card-wrap">
+                        <img src="{{ asset('images/two.jpg') }}" alt="Employee Services" class="service-card-img" />
+                        <div class="service-card-body">
+                            <div class="card-top-row">
+                                <span class="service-badge">Workforce</span>
+                                <div class="service-card-icon"><i class="bi bi-people"></i></div>
+                            </div>
+                            <h5 class="service-card-title">Employee Services</h5>
+                            <p class="service-card-desc">Everything employees need to manage their work, track clients and close more sales.</p>
+                            <ul class="service-card-list">
+                                <li>Clients Management</li>
+                                <li>Sales Management</li>
+                                <li>Internal Services</li>
+                            </ul>
+                            <div class="card-footer-row">
+                                <a href="#" class="card-read-more">Get started <i class="bi bi-arrow-up-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="service-card-wrap">
+                        <img src="{{ asset('images/client.jpg') }}" alt="Client Applicant" class="service-card-img" />
+                        <div class="service-card-body">
+                            <div class="card-top-row">
+                                <span class="service-badge">Applicant</span>
+                                <div class="service-card-icon"><i class="bi bi-person-badge"></i></div>
+                            </div>
+                            <h5 class="service-card-title">Client / Applicant</h5>
+                            <p class="service-card-desc">Discover opportunities, build your CV and connect directly with hiring companies.</p>
+                            <ul class="service-card-list">
+                                <li>Articles Feed</li>
+                                <li>Company Offers</li>
+                                <li>CV Management</li>
+                            </ul>
+                            <div class="card-footer-row">
+                                <a href="{{ path('app_registration') }}" class="card-read-more">Get started <i class="bi bi-arrow-up-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    {# ══ CAPABILITIES ══ #}
+    <section class="capabilities-section py-5">
+        <div class="container text-center">
+            <div class="mb-5">
+                <h6 class="text-uppercase fw-bold small opacity-50">Capabilities</h6>
+                <h2 class="display-5 fw-bold mb-3">What we bring to the table</h2>
+                <p class="text-secondary mx-auto" style="max-width:600px;">
+                    Whether you're running a company, managing a team, or searching for your next opportunity —
+                    we connect you with the tools and people that matter.
+                </p>
+            </div>
+            <div class="row g-4 mt-2">
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <i class="bi bi-briefcase fs-2 mb-3 d-block" style="color:var(--primary-teal);"></i>
+                        <h4 class="h5">Seamless Collaboration</h4>
+                        <p class="text-secondary small">Unified workspace for companies, employees and clients.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <i class="bi bi-globe fs-2 mb-3 d-block" style="color:var(--primary-teal);"></i>
+                        <h4 class="h5">Global Reach</h4>
+                        <p class="text-secondary small">Access markets and talent across every major region.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <i class="bi bi-gear fs-2 mb-3 d-block" style="color:var(--primary-teal);"></i>
+                        <h4 class="h5">Expert Support</h4>
+                        <p class="text-secondary small">Our team stands ready to help you succeed at every step.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 d-flex justify-content-center align-items-center gap-3 flex-wrap">
+                <a href="#" class="btn btn-hero px-4" style="color:#F6F6F2;border:1px solid #F6F6F2;">
+                    Discover offers
+                </a>
+                <a href="{{ path('app_registration') }}" class="text-white text-decoration-none">
+                    Create account <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.addEventListener("load", () => {
+            document.querySelectorAll(".service-card-wrap").forEach((card, i) => {
+                setTimeout(() => card.classList.add("show"), 300 + i * 150);
+            });
+        });
+
+        const toggle = document.getElementById('themeToggle');
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            toggle.textContent = '☀️ Light Mode';
+        }
+
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+
+            if (document.body.classList.contains('dark-mode')) {
+                toggle.textContent = '☀️ Light Mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                toggle.textContent = '🌙 Dark Mode';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+    </script>
+{% endblock %}

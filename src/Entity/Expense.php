@@ -31,7 +31,6 @@ class Expense
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    // ---------------- GETTERS & SETTERS ----------------
 
     public function getId(): ?int
     {

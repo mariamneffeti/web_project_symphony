@@ -1,0 +1,32 @@
+.badge-rent { 
+    background-color: #E3F2FD; 
+    color: #1565C0; 
+    border: 1px solid #BBDEFB; }      
+.badge-salary { 
+    background-color: #E8F5E9; 
+    color: #2E7D32; 
+    border: 1px solid #C8E6C9; }   
+.badge-tools { 
+    background-color: #FFF3E0; 
+    color: #EF6C00; 
+    border: 1px solid #FFE0B2; }    
+.badge-marketing { 
+    background-color: #FCE4EC; 
+    color: #C2185B; 
+    border: 1px solid #F8BBD0; }   
+.badge-supplies { 
+    background-color: #F3E5F5; 
+    color: #7B1FA2; 
+    border: 1px solid #E1BEE7; }   
+.badge-other { 
+    background-color: #ECEFF1; 
+    color: #455A64; 
+    border: 1px solid #CFD8DC; }      
+
+.category-badge {
+    font-weight: 600;
+    padding: 0.5em 1em;
+    border-radius: 50px; 
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
