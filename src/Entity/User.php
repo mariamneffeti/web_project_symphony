@@ -47,8 +47,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // ── UserInterface ───────────────────────────────────────────────
-
     public function getRoles(): array
     {
         return match ($this->role) {
@@ -60,8 +58,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string { return (string) $this->email; }
     public function eraseCredentials(): void {}
-
-    // ── Getters / Setters ───────────────────────────────────────────
 
     public function getId(): ?int { return $this->id; }
 
