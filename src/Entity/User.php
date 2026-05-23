@@ -16,13 +16,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'first_name', length: 100)]
+    #[ORM\Column(name: 'first_name', length: 50)]
     private ?string $firstName = null;
 
-    #[ORM\Column(name: 'last_name', length: 100)]
+    #[ORM\Column(name: 'last_name', length: 50)]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(length: 50)]
@@ -33,6 +33,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Company::class)]
+    private ?Company $company = null;
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): self
+    {
+        $this->company = $company;
+        return $this;
+    }
 
     // ── UserInterface ───────────────────────────────────────────────
 
