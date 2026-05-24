@@ -16,11 +16,13 @@
             --bg-light:     #F6F6F2;
             --accent-blue:  #102E4A;
         }
+
         body { background-color: var(--bg-light); font-family: 'Inter', sans-serif; }
 
         .custom-navbar {
             background: linear-gradient(90deg, var(--primary-teal), var(--dark-forest));
         }
+
         .dropdown-toggle::after { display: none !important; }
 
         .form-control, .form-select {
@@ -33,9 +35,10 @@
             box-shadow: 0 4px 8px rgba(16,46,74,0.1);
             outline: none;
         }
+
         .dropdown-menu { border-radius: 8px; padding: 8px 0; }
         .dropdown-item { font-weight: 500; transition: background 0.2s; }
-        .dropdown-item:hover { background-color: rgba(255,255,255,0.15); color: white; }
+        .dropdown-item:hover { background-color: rgba(255,255,255,0.1); color: white; }
 
         .footer-forest {
             background: linear-gradient(180deg, var(--primary-teal) 0%, var(--dark-forest) 100%);
@@ -48,25 +51,6 @@
             transition: all 0.3s ease;
         }
         .footer-link:hover { color: #fff; padding-left: 5px; }
-
-        /* Profile pill button in navbar */
-        .profile-pill {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 20px;
-            padding: 4px 14px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-        .profile-pill:hover {
-            background: rgba(255,255,255,0.25);
-            color: white;
-        }
     </style>
 
     {% block stylesheets %}{% endblock %}
@@ -77,17 +61,14 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark custom-navbar">
     <div class="container-fluid">
 
-        {# Mobile toggler → offcanvas #}
         <button class="navbar-toggler me-2" type="button"
                 data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        {# Brand #}
         <img src="{{ asset('images/logoentreprisa.png') }}" height="50" width="70" alt="Logo">
         <a class="navbar-brand fw-bold h1" href="{{ path('normal_user_home') }}">Entreprisa</a>
 
-        {# Desktop nav links #}
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto gap-3">
                 <li class="nav-item">
@@ -95,55 +76,53 @@
                        href="{{ path('normal_user_home') }}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Offre</a>
+                    <a class="nav-link {{ app.request.attributes.get('_route') == 'client_offre' ? 'active' : '' }}"
+                       href="#">Offre</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">CV</a>
+                    <a class="nav-link {{ app.request.attributes.get('_route') == 'client_cv' ? 'active' : '' }}"
+                       href="#">CV</a>
                 </li>
             </ul>
         </div>
 
-        {# ── User section (desktop) ── #}
-        {# Use real logged-in user, or mock_user while login is not yet wired #}
+        {# ── User dropdown — mirrors PHP project exactly ── #}
         {% set currentUser = app.user ?? mock_user ?? null %}
         {% if currentUser %}
-            <div class="d-flex align-items-center gap-2 ms-auto">
-
-                {# Visible profile pill — always clickable #}
-                <a href="{{ path('normal_user_profile') }}" class="profile-pill d-none d-lg-flex">
-                    {% if currentUser.image %}
-                        <img src="{{ asset('uploads/' ~ currentUser.image) }}"
-                             width="26" height="26" class="rounded-circle">
-                    {% else %}
-                        <img src="{{ asset('images/profile.png') }}"
-                             width="26" height="26" class="rounded-circle">
-                    {% endif %}
-                    {{ currentUser.firstName }}
-                </a>
-
-                {# Chevron dropdown for logout etc. #}
+            <div class="navbar-nav ms-auto">
                 <div class="nav-item dropdown">
-                    <a class="nav-link d-flex align-items-center" href="#"
-                       role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-chevron-down text-white"></i>
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                       id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        {% if currentUser.image %}
+                            <img src="{{ asset('uploads/' ~ currentUser.image) }}"
+                                 alt="Profile" width="32" height="32" class="rounded-circle me-2">
+                        {% else %}
+                            <img src="{{ asset('images/profile.png') }}"
+                                 alt="Profile" width="32" height="32" class="rounded-circle me-2">
+                        {% endif %}
+                        <span class="ms-2 d-none d-sm-inline">{{ currentUser.firstName }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2"
-                        style="background-color:#212529; min-width:180px;">
+                        style="background-color:#212529;">
                         <li>
-                            <a class="dropdown-item text-white d-flex align-items-center gap-2"
-                               href="{{ path('normal_user_profile') }}">
-                                <i class="bi bi-person-circle"></i> My Profile
+                            <a class="dropdown-item text-white" href="{{ path('normal_user_profile') }}">
+                                {% if currentUser.image %}
+                                    <img src="{{ asset('uploads/' ~ currentUser.image) }}" width="24" class="me-2 rounded-circle">
+                                {% else %}
+                                    <img src="{{ asset('images/profile.png') }}" width="24" class="me-2">
+                                {% endif %}
+                                Profil
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider border-secondary my-1"></li>
+                        <li><hr class="dropdown-divider border-secondary"></li>
                         <li>
-
-                                <i class="bi bi-box-arrow-right"></i> Logout
+                            <a class="dropdown-item text-danger" href="#">
+                                <img src="{{ asset('images/logout.png') }}" width="24" class="me-2">
+                                Logout
                             </a>
                         </li>
                     </ul>
                 </div>
-
             </div>
         {% endif %}
 
@@ -158,8 +137,7 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
-        {# Use real logged-in user, or mock_user while login is not yet wired #}
-        {% set currentUser = app.user ?? mock_user ?? null %}
+        {# User info block at top of sidebar #}
         {% if currentUser %}
             <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded"
                  style="background:rgba(255,255,255,0.1);">
@@ -177,7 +155,7 @@
             </div>
         {% endif %}
 
-        <ul class="nav flex-column gap-2">
+        <ul class="nav flex-column gap-3">
             <li class="nav-item">
                 <a class="nav-link text-white d-flex align-items-center gap-2
                    {{ app.request.attributes.get('_route') == 'normal_user_home' ? 'active' : '' }}"
@@ -195,12 +173,8 @@
                     <i class="bi bi-person-plus"></i> CV
                 </a>
             </li>
-
-            <hr class="border-secondary opacity-50 my-2">
-
-            {# Use real logged-in user, or mock_user while login is not yet wired #}
-            {% set currentUser = app.user ?? mock_user ?? null %}
             {% if currentUser %}
+                <hr class="border-secondary opacity-50 my-1">
                 <li class="nav-item">
                     <a class="nav-link text-white d-flex align-items-center gap-2
                    {{ app.request.attributes.get('_route') == 'normal_user_profile' ? 'active' : '' }}"
@@ -209,7 +183,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-
+                    <a class="nav-link text-danger d-flex align-items-center gap-2" href="#">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </li>

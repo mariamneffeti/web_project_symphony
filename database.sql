@@ -242,7 +242,7 @@ CREATE TABLE meeting_employees (
 -- Insert sample company user
 INSERT INTO users (first_name, last_name, email, password, role, image) VALUES
                                                                             ('Yasmine', 'Bouziri', 'admin@techcorp.tn', '$2y$10$ZFsT1Sb/cCT3fiPe35fiD.nWI1DHNky1fwpyy3ko.sWkgDGOkx4Eu', 'company', 'profiles/yasmine.jpg'),
-                                                                            ('Sarah', 'Connor', 'employee@demo.com', '$2y$10$ZFsT1Sb/cCT3fiPe35fiD.nWI1DHNky1fwpyy3ko.sWkgDGOkx4Eu', 'employee', 'profiles/sarah.jpg'),
+                                                                            ('Sarah', 'Connor', 'employee@demo.com', '$2y$10$ZFsT1Sb/cCT3fiPe35fiD.nWI1DHNky1fwpyy3ko.sWkgDGOkx4Eu', 'c', 'profiles/sarah.jpg'),
                                                                             ('Meriam', 'Cherif', 'meriam.cherif2005@gmail.com', '$2y$10$ZFsT1Sb/cCT3fiPe35fiD.nWI1DHNky1fwpyy3ko.sWkgDGOkx4Eu', 'normal', 'profiles/meriam.jpg');
 
 -- Insert sample Company
@@ -268,7 +268,6 @@ INSERT INTO clients (company_id, client_name, email, phone, client_type, status,
                                                                                                                       (1, 'Gamma Corp', 'gamma@corp.com', '+216-70-000-003', 'B2B', 'Active', 32000.00, DATE_SUB(CURDATE(), INTERVAL 10 DAY)),
                                                                                                                       (1, 'Delta Systems', 'delta@systems.com', '+216-70-000-004', 'B2B', 'Active', 14000.00, DATE_SUB(CURDATE(), INTERVAL 3 DAY));
 
--- 🟡 MEDIUM RISK CLIENTS
 
 INSERT INTO clients (company_id, client_name, email, phone, client_type, status, total_spent, last_purchase_date) VALUES
                                                                                                                       (1, 'Epsilon Group', 'epsilon@group.com', '+216-70-000-005', 'B2B', 'Active', 9000.00, DATE_SUB(CURDATE(), INTERVAL 30 DAY)),
@@ -276,7 +275,6 @@ INSERT INTO clients (company_id, client_name, email, phone, client_type, status,
                                                                                                                       (1, 'Eta Services', 'eta@services.com', '+216-70-000-007', 'B2C', 'Active', 5000.00, DATE_SUB(CURDATE(), INTERVAL 45 DAY)),
                                                                                                                       (1, 'Theta Consulting', 'theta@consult.com', '+216-70-000-008', 'B2B', 'Active', 11000.00, DATE_SUB(CURDATE(), INTERVAL 35 DAY));
 
--- 🔴 HIGH RISK / CHURNED CLIENTS
 
 INSERT INTO clients (company_id, client_name, email, phone, client_type, status, total_spent, last_purchase_date) VALUES
                                                                                                                       (1, 'Iota Holdings', 'iota@hold.com', '+216-70-000-009', 'B2B', 'Inactive', 4000.00, DATE_SUB(CURDATE(), INTERVAL 90 DAY)),
