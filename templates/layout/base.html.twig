@@ -239,15 +239,15 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto gap-2">
                 {% set nav = [
-                    ['Home',          'employee_index'],
-                    ['Employees',     'employee_index'],
-                    ['Clients',       'employee_index'],
-                    ['Recruitment',   'recruitement'],
-                    ['Stock',         'employee_index'],
-                    ['Sales & Services', 'salesC'],
-                    ['Management',    'management'],
-                    ['Articles',      'article_index'],
-                    ['Finance',       'finance'],
+                    ['Home',          'company_homeCompany'],
+                    ['Employees',     'company_employee_index'],
+                    ['Clients',       'company_client_index'],
+                    ['Recruitment',   'company_recruitment'],
+                    ['Stock',         'company_stock'],
+                    ['Sales & Services', 'company_sales'],
+                    ['Management',    'company_management'],
+                    ['Articles',      'company_article_index'],
+                    ['Finance',       'company_finance'],
                 ] %}
                 {% for item in nav %}
                     <li class="nav-item">
@@ -275,7 +275,7 @@
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="background-color: #212529;">
                     <li><a class="dropdown-item text-white" href="{{ path('profile_index') }}"><img src="{{ asset('images/profile.png') }}" width="32" height="32" class="rounded-circle me-2">Profil</a></li>
                     <li><hr class="dropdown-divider border-secondary"></li>
-                    <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><img src="{{ asset('images/profile.png') }}" width="24" class="me-2">Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><img src="{{ asset('images/logout.png') }}" width="24" class="me-2">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -290,15 +290,15 @@
     <div class="offcanvas-body">
         <ul class="nav flex-column gap-2">
             {% set sidebar = [
-                ['bi-house',        'Home',       'employee_index'],
-                ['bi-people',       'Employees',  'employee_index'],
-                ['bi-people-fill',  'Clients',    'employee_index'],
-                ['bi-person-plus',  'Recruitment','recruitement'],
-                ['bi-box-seam',     'Stock',      'employee_index'],
-                ['bi-cart',         'Sales & Services',      'salesC'],
-                ['bi-calendar-check','Management','management'],
-                ['bi-newspaper',    'Articles',   'article_index'],
-                ['bi-cash-stack',   'Finance',    'finance'],
+                ['bi-house',        'Home',       'company_homeCompany'],
+                ['bi-people',       'Employees',  'company_employee_index'],
+                ['bi-people-fill',  'Clients',    'company_client_index'],
+                ['bi-person-plus',  'Recruitment','company_recruitment'],
+                ['bi-box-seam',     'Stock',      'company_stock'],
+                ['bi-cart',         'Sales & Services',      'company_sales'],
+                ['bi-calendar-check','Management','company_management'],
+                ['bi-newspaper',    'Articles',   'company_article_index'],
+                ['bi-cash-stack',   'Finance',    'company_finance'],
             ] %}
             {% for item in sidebar %}
                 <li class="nav-item">
