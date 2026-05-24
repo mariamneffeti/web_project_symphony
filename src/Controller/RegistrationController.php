@@ -45,11 +45,14 @@ final class RegistrationController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            return $this->redirectToRoute(
-                $user->getRole() === 'company' ? 'employee_index' : 'app_client'
-            );
+return $this->redirectToRoute(
+    match($user->getRole()) {
+        'company'  => 'employee_index',
+        default   => 'normal_user_home'
+    }
+);
         }
-            return $this->render('registration/registration.html.twig', [
+            return $this->render('registration/registration.html.twig',
                 'registrationForm' => $form->createView()]);
         }
 

@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use App\Entity\User;
-
 
 final class LoginController extends AbstractController
 {
@@ -17,17 +16,23 @@ final class LoginController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
+        // If user is already authenticated, redirect by role
         if ($user !== null) {
             $roles = $user->getRoles();
 
             return match (true) {
-                in_array('ROLE_COMPANY',  $roles) => $this->redirectToRoute('company_dashboard'),
-                in_array('ROLE_EMPLOYEE', $roles) => $this->redirectToRoute('employee_dashboard'),
-                default                           => $this->redirectToRoute('normal_user_home'),
+                in_array('ROLE_COMPANY', $roles, true)  => $this->redirectToRoute('company_dashboard'),
+                in_array('ROLE_EMPLOYEE', $roles, true) => $this->redirectToRoute('employee_dashboard'),
+                default                                 => $this->redirectToRoute('normal_user_home'),
             };
         }
 
+<<<<<<< HEAD
+        // Login form data
+        $error = $authenticationUtils->getLastAuthenticationError();
+=======
         $error        = $authenticationUtils->getLastAuthenticationError();
+>>>>>>> 874bbfbf32b84e1552e215825301f49e815eddbb
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('login/index.html.twig', [

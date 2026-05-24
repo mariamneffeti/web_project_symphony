@@ -29,7 +29,7 @@ security:
 
     access_control:
         - { path: ^/login,      roles: PUBLIC_ACCESS }
-        - { path: ^/company,    roles: ROLE_COMPANY  }
+        - { path: ^/homeCompany,    roles: ROLE_COMPANY  }
         - { path: ^/employee,   roles: ROLE_EMPLOYEE }
         - { path: ^/normaluser, roles: ROLE_USER     }
         - { path: ^/clients,    roles: ROLE_USER     }
