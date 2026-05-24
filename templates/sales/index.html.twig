@@ -1,0 +1,376 @@
+{# templates/sales/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Sales Management{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+  background: #F6F6F2;
+  font-family: Inter, system-ui, sans-serif;
+  color: #1f2933;
+}
+.navbar { background: #388087; }
+.dropdown-toggle::after { display: none; }
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.06);
+  transition: .3s ease;
+}
+.card:hover { transform: translateY(-4px); }
+.kpi { border-left: 6px solid #102E4A; }
+.btn-primary-custom { background: #388087; border: none; color: white; }
+.btn-primary-custom:hover { background: #2f6f75; color: white; }
+.table thead { background: #102E4A; color: white; }
+footer { background: linear-gradient(180deg, #388087, #0d1f1b); }
+a.footer-link,
+a.footer-link:link,
+a.footer-link:visited { color: rgba(255,255,255,0.8) !important; text-decoration: none; }
+a.footer-link:hover { color: white !important; padding-left: 5px; }
+
+/* Modal styling */
+.modal-header { background: #102E4A; color: white; border-radius: 12px 12px 0 0; }
+.modal-header .btn-close { filter: invert(1); }
+.item-row { background: #f8f9fa; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+.item-row .btn-remove { color: #dc3545; background: none; border: none; font-size: 1.1rem; }
+
+/* Pagination */
+.pagination .page-link { color: #388087; border-color: #dee2e6; }
+.pagination .page-item.active .page-link { background: #388087; border-color: #388087; color: white; }
+.pagination .page-link:hover { background: #e9ecef; color: #2f6f75; }
+
+/* Toast animations */
+@keyframes slideIn  { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+@keyframes slideOut { from { transform: translateX(0); opacity:1; } to { transform: translateX(120%); opacity:0; } }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── Navbar ── #}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">Employee Dashboard</a>
+
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-center" id="nav">
+      <ul class="navbar-nav gap-4 fw-semibold">
+        <li class="nav-item"><a class="nav-link" href="{{ path('client_index') }}">Clients</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ path('sales_index')}}">Sales</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('services_index')}}">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('stock_index')}}">Stock</a></li>
+      </ul>
+    </div>
+
+    <div class="d-flex align-items-center ms-auto">
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+          <img src="{{ asset('images/profile.png') }}" class="rounded-circle me-2" width="32" height="32">
+          <span class="text-white">{{ app.user ? app.user.userIdentifier : 'Employee' }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" style="background-color: #212529;">
+          <li>
+            <a class="dropdown-item text-white" href="#">
+              <i class="bi bi-person me-2"></i> Profile
+            </a>
+          </li>
+          <li><hr class="dropdown-divider border-secondary"></li>
+          <li>
+            <a class="dropdown-item text-danger" href="#">
+              <i class="bi bi-box-arrow-right me-2"></i> Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+{# ── Main ── #}
+<main class="container py-4">
+
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold">Sales Performance</h1>
+      <p class="text-muted mb-0">Track revenue, growth, and client transactions.</p>
+    </div>
+    {# NEW SALE BUTTON #}
+    <button class="btn btn-primary-custom px-4 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#newSaleModal">
+      <i class="bi bi-plus-lg me-1"></i> New Sale
+    </button>
+  </header>
+
+  {# KPI Cards #}
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card p-4 kpi">
+        <small class="text-muted fw-semibold">Monthly Revenue</small>
+        <h5 id="stat-monthly-revenue" class="fw-bold">—</h5>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card p-4 kpi">
+        <small class="text-muted fw-semibold">Closed Deals</small>
+        <h5 id="stat-closed-deals" class="fw-bold">—</h5>
+        <span id="stat-closed-target" class="small text-muted"></span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card p-4 kpi">
+        <small class="text-muted fw-semibold">Pending Quotes</small>
+        <h5 id="stat-pending-quotes" class="fw-bold">—</h5>
+        <span class="text-warning small">Needs follow-up</span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card p-4 kpi">
+        <small class="text-muted fw-semibold">Total Clients</small>
+        <h5 id="stat-total-clients" class="fw-bold">—</h5>
+        <span class="text-muted small">Registered clients</span>
+      </div>
+    </div>
+  </div>
+
+  {# Revenue Chart #}
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="fw-semibold mb-3">Revenue Forecast</h5>
+      <div id="chart-container" class="bg-light rounded p-5 text-center text-muted"></div>
+    </div>
+  </div>
+
+  {# Transactions Table #}
+  <section class="card">
+    <div class="card-header bg-white py-3">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <h5 class="mb-0 fw-semibold">Recent Transactions</h5>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          {# Date range filters #}
+          <input type="date" id="filter-start-date" class="form-control form-control-sm" style="width:150px;" title="Start date">
+          <span class="text-muted small">to</span>
+          <input type="date" id="filter-end-date" class="form-control form-control-sm" style="width:150px;" title="End date">
+          {# Type filter #}
+          <select id="filter-type" class="form-select form-select-sm" style="width:160px;">
+            <option value="all">All Types</option>
+            <option value="service">Service</option>
+            <option value="sale">Product Sale</option>
+          </select>
+          {# Search #}
+          <input id="filter-search" class="form-control form-control-sm" placeholder="Search client / item…" style="width:200px;">
+          {# Clear #}
+          <button id="btn-clear-filters" class="btn btn-sm btn-outline-secondary">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="transaction-table-body">
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">Loading…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    {# Pagination #}
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2">
+      <small class="text-muted" id="pagination-info">—</small>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="pagination-controls"></ul>
+      </nav>
+    </div>
+  </section>
+
+</main>
+
+{# ── NEW SALE MODAL ── #}
+<div class="modal fade" id="newSaleModal" tabindex="-1" aria-labelledby="newSaleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:16px; overflow:hidden;">
+
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="newSaleModalLabel">
+          <i class="bi bi-cart-plus me-2"></i>New Sale
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body p-4">
+
+        {# Row 1: Client + Date #}
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Client <span class="text-danger">*</span></label>
+            <select id="sale-client-id" class="form-select" required>
+              <option value="">Loading clients…</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Sale Date <span class="text-danger">*</span></label>
+            <input type="date" id="sale-date" class="form-control" required>
+          </div>
+        </div>
+
+        {# Row 2: Payment method + Status #}
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Payment Method <span class="text-danger">*</span></label>
+            <select id="sale-payment-method" class="form-select" required>
+              <option value="">Select method…</option>
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Cheque">Cheque</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Payment Status</label>
+            <select id="sale-payment-status" class="form-select">
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        {# Row 3: Discount + Notes #}
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Discount ($)</label>
+            <input type="number" id="sale-discount" class="form-control" min="0" step="0.01" value="0">
+          </div>
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">Notes</label>
+            <input type="text" id="sale-notes" class="form-control" placeholder="Optional notes…">
+          </div>
+        </div>
+
+        {# Product Items #}
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-semibold mb-0"><i class="bi bi-box me-1 text-primary"></i>Product Items</h6>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-product">
+              <i class="bi bi-plus"></i> Add Product
+            </button>
+          </div>
+          <div id="product-items-container"></div>
+        </div>
+
+        {# Service Items #}
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-semibold mb-0"><i class="bi bi-tools me-1 text-info"></i>Service Items</h6>
+            <button type="button" class="btn btn-sm btn-outline-info" id="btn-add-service">
+              <i class="bi bi-plus"></i> Add Service
+            </button>
+          </div>
+          <div id="service-items-container"></div>
+        </div>
+
+        {# Totals preview #}
+        <div class="border-top pt-3 mt-3">
+          <div class="d-flex justify-content-end">
+            <table class="table table-sm w-auto text-end mb-0">
+              <tr><td class="text-muted pe-4">Subtotal</td><td class="fw-semibold" id="preview-subtotal">$0.00</td></tr>
+              <tr><td class="text-muted pe-4">Discount</td><td class="fw-semibold text-danger" id="preview-discount">-$0.00</td></tr>
+              <tr><td class="text-muted pe-4">Tax (10%)</td><td class="fw-semibold" id="preview-tax">$0.00</td></tr>
+              <tr class="fs-6">
+                <td class="fw-bold pe-4">Total</td>
+                <td class="fw-bold text-success" id="preview-total">$0.00</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+      </div>{# /modal-body #}
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary-custom fw-semibold px-4" id="btn-save-sale">
+          <i class="bi bi-check-lg me-1"></i> Save Sale
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{# ── Footer ── #}
+<footer class="text-white py-5" style="height:400px;">
+  <div class="container" style="margin-top:5rem;">
+    <div class="row gy-4">
+      <div class="col-lg-4 col-md-12">
+        <span class="fw-bold fs-4 text-uppercase">Entreprisa</span>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Start your business</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Join us as a company leader</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Try Entreprisa</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">The Product</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Contact us</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Questions</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Blog</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Legal</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Privacy policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="opacity-25">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-50 pt-3">
+      <p class="mb-0">© 2026 Entreprisa. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+{# Pass Symfony routes to JS #}
+<script>
+const ROUTES = {
+    salesStats:   "{{ path('sales_api_stats') }}",
+    salesList:    "{{ path('sales_api_list') }}",
+    salesCreate:  "{{ path('sales_api_create') }}",
+    salesGet:     "{{ path('sales_api_get', {'id': '__ID__'}) }}",
+    salesUpdate:  "{{ path('sales_api_update', {'id': '__ID__'}) }}",
+    salesDelete:  "{{ path('sales_api_delete', {'id': '__ID__'}) }}",
+    clientsList:  "{{ path('client_api_list') }}",
+};
+</script>
+
+<script src="{{ asset('js/sales.js') }}"></script>
+{% endblock %}

@@ -19,3 +19,6 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 /.vscode/
+.env.dev
+.env
+.env.test
