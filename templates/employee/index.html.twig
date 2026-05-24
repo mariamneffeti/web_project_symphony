@@ -137,13 +137,22 @@
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">CV</label>
                     <div class="input-group">
-                        <input type="text" id="cvPathInput" name="cv_path"
-                               class="form-control" placeholder="No CV uploaded yet" readonly>
-                        <button type="button" class="btn btn-teal">
-                            <i class="bi bi-upload me-1"></i> Upload CV
-                        </button>
+                        <input type="file"
+                               name="cv_file"
+                               id="cvFileInput"
+                               class="form-control"
+                               accept=".pdf,.doc,.docx">
                     </div>
-                    <div class="form-text text-muted">Click "Upload CV" to attach a CV file.</div>
+                    <div class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Accepted formats: PDF, DOC, DOCX
+                    </div>
+                    <div id="cvPreview" style="display:none; margin-top:.5rem;">
+                    <span class="badge" style="background:rgba(56,128,135,.12);color:var(--teal);padding:.4em .8em;border-radius:8px;font-size:.8rem;">
+                        <i class="bi bi-file-earmark-text me-1"></i>
+                        <span id="cvFileName"></span>
+                    </span>
+                    </div>
                 </div>
 
                 <div class="col-12 d-flex justify-content-end">
@@ -253,6 +262,19 @@
             c.appendChild(el);
             setTimeout(() => el.remove(), 3500);
         }
+        document.getElementById('cvFileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                toast('File too large (max 5MB).', 'error');
+                this.value = '';
+                return;
+            }
+
+            document.getElementById('cvFileName').textContent = file.name;
+            document.getElementById('cvPreview').style.display = 'block';
+        });
 
 
         document.getElementById('employeeForm').addEventListener('submit', async function(e) {
