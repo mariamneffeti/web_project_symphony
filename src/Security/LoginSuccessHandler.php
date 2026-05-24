@@ -17,7 +17,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         $roles = $token->getUser()->getRoles();
 
         return match (true) {
-            in_array('ROLE_COMPANY',  $roles) => new RedirectResponse($this->router->generate('company_dashboard')),
+            in_array('ROLE_COMPANY',  $roles) => new RedirectResponse($this->router->generate('homeCompany')),
             in_array('ROLE_EMPLOYEE', $roles) => new RedirectResponse($this->router->generate('employee_dashboard')),
             default                           => new RedirectResponse($this->router->generate('normal_user_home')),
         };

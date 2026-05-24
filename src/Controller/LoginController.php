@@ -27,8 +27,12 @@ final class LoginController extends AbstractController
             };
         }
 
+<<<<<<< HEAD
         // Login form data
         $error = $authenticationUtils->getLastAuthenticationError();
+=======
+        $error        = $authenticationUtils->getLastAuthenticationError();
+>>>>>>> 874bbfbf32b84e1552e215825301f49e815eddbb
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('login/index.html.twig', [
