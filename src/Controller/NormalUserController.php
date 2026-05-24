@@ -2,11 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Article;
 use App\Entity\User;
 use App\Form\ProfileType;
 use App\Repository\ArticleRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -21,6 +19,8 @@ class NormalUserController extends AbstractController
     #[Route('/normaluser/home', name: 'normal_user_home')]
     public function home(ArticleRepository $articleRepository): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         /** @var User $user */
         $user     = $this->getUser();
         $articles = $articleRepository->findBy([], ['arDate' => 'DESC'], 9);
@@ -35,27 +35,24 @@ class NormalUserController extends AbstractController
     public function profile(
         Request $request,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $hasher
+        UserPasswordHasherInterface $hasher,
+        SluggerInterface $slugger          // ← was missing
     ): Response {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         /** @var User $user */
         $user = $this->getUser();
-
-        if (!$user) {
-            throw $this->createNotFoundException('User not found.');
-        }
 
         $form = $this->createForm(ProfileType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // Handle password change
             $plainPassword = $form->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $user->setPassword($hasher->hashPassword($user, $plainPassword));
             }
 
-            // Handle image upload
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
                 $safeFilename = $slugger->slug($user->getFirstName() . '-' . $user->getLastName());
