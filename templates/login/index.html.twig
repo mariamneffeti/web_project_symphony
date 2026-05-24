@@ -104,9 +104,9 @@
         {% endif %}
 
         <form method="post" action="{{ path('app_login') }}">
-            <input type="email" name="email" placeholder="Email Address"
+            <input type="email" name="_username" placeholder="Email Address"
                    value="{{ last_username }}" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="_password" placeholder="Password" required>
 
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 

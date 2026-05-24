@@ -1,0 +1,58 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Recruitment{% endblock %}
+
+{% block page_title %}Recruitment{% endblock %}
+{% set active_page = 'Recruitment' %}
+
+{% block body %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 75vh;">
+    <div class="row justify-content-center w-100">
+        <div class="col-12 col-md-10 col-lg-8 text-center text-dark-forest">
+            
+            <div class="mb-4">
+                <span class="badge rounded-pill px-3 py-2 text-uppercase tracking-wider small" 
+                      style="background-color: rgba(56, 128, 135, 0.15); color: #388087; font-weight: 700; letter-spacing: 1px;">
+                    <i class="bi bi-clock-history me-1"></i> Feature Coming Soon
+                </span>
+            </div>
+
+            <h1 class="display-4 fw-bold mb-3" style="color: #0d1f1b;">
+                Recruitment Hub
+            </h1>
+            
+            <p class="lead text-muted mx-auto mb-5" style="max-width: 600px; font-size: 1.15rem; line-height: 1.6;">
+                Welcome to your future recruitment module. Soon you will be able to manage live job postings, screen candidate applications, and streamline your entire hiring lifecycle from one centralized dashboard.
+            </p>
+
+            <div class="row g-3 text-start justify-content-center mb-4">
+                <div class="col-12 col-sm-4">
+                    <div class="p-3 rounded-3 border-0 shadow-sm bg-white text-center h-100 transition-up">
+                        <i class="bi bi-briefcase text-teal mb-2 d-block" style="font-size: 1.75rem; color: #388087;"></i>
+                        <span class="fw-bold small text-dark d-block">Manage Positions</span>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <div class="p-3 rounded-3 border-0 shadow-sm bg-white text-center h-100 transition-up">
+                        <i class="bi bi-file-earmark-person text-teal mb-2 d-block" style="font-size: 1.75rem; color: #388087;"></i>
+                        <span class="fw-bold small text-dark d-block">Track Applicants</span>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <div class="p-3 rounded-3 border-0 shadow-sm bg-white text-center h-100 transition-up">
+                        <i class="bi bi-clipboard-check text-teal mb-2 d-block" style="font-size: 1.75rem; color: #388087;"></i>
+                        <span class="fw-bold small text-dark d-block">Hiring Workflow</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <a href="/management" class="btn btn-finance px-4 py-2 rounded-3 shadow-sm text-white" style="background-color: #388087; transition: all 0.3s ease;">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Management
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

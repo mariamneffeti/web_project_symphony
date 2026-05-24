@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,12 +12,11 @@ use App\Repository\MeetingRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\ClientRepository;
 use App\Entity\Meeting;
-use App\Entity\Company;
 use App\Form\MeetingType;
 use App\Form\MeetingUpdateType;
 use App\Form\ClientEmailType;
 
-final class ManagementController extends AbstractController
+final class ManagementController extends AbstractCompanyController
 {
     private HttpClientInterface $httpClient;
 
@@ -30,27 +28,35 @@ final class ManagementController extends AbstractController
     #[Route('/management', name: 'management')]
     public function index(): Response
     {
+        // Instantly validates authorization context via AbstractCompanyController
+        $company = $this->getCompanyContext();
+
         $meeting = new Meeting();
         $addForm = $this->createForm(MeetingType::class, $meeting);
         $updateForm = $this->createForm(MeetingUpdateType::class, $meeting);
         $emailForm = $this->createForm(ClientEmailType::class);
 
         return $this->render('management/index.html.twig', [
-            'controller_name' => 'ManagementController',
-            'form'            => $addForm->createView(), 
-            'updateForm'      => $updateForm->createView(),
-            'emailForm'       => $emailForm->createView(),
+            'controller_name'    => 'ManagementController',
+            'form'               => $addForm->createView(), 
+            'updateForm'         => $updateForm->createView(),
+            'emailForm'          => $emailForm->createView(),
             'zapier_webhook_url' => $this->getParameter('app.zapier_webhook'),
+            'company_name'       => $company->getCompanyName(),
         ]);
     }
 
-    // Fetching meetings sorted by status (scheduled first) and date (closest to farthest)
+    // Fetching meetings sorted by status and date, isolated strictly by company context
     #[Route('/api/meetings', name: 'api_meetings', methods: ['GET'])]
     public function getMeetings(MeetingRepository $repo): JsonResponse
     {
+        $company = $this->getCompanyContext();
+
         $meetings = $repo->createQueryBuilder('m')
             ->addSelect('CASE WHEN m.status = :sched THEN 0 ELSE 1 END AS HIDDEN status_priority')
+            ->where('m.company = :company')
             ->setParameter('sched', 'scheduled')
+            ->setParameter('company', $company)
             ->orderBy('status_priority', 'ASC')       
             ->addOrderBy('m.meetingDate', 'ASC')     
             ->addOrderBy('m.meetingTime', 'ASC')     
@@ -72,29 +78,24 @@ final class ManagementController extends AbstractController
         return new JsonResponse($data);
     }
 
-    // Add Meeting
+    // Add Meeting mapped securely to the authenticated session context
     #[Route('/api/meetings/add', name: 'api_meetings_add', methods: ['POST'])]
     public function addMeeting(Request $request, EntityManagerInterface $em, EmployeeRepository $employeeRepo): JsonResponse
     {
+        $company = $this->getCompanyContext();
+
         $meeting = new Meeting();
         $form = $this->createForm(MeetingType::class, $meeting);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $company = $em->getRepository(Company::class)->find(1);
-                if (!$company) {
-                    return new JsonResponse(['success' => false, 'error' => 'Company with ID 1 does not exist.'], 400);
-                }
-                $meeting->setCompany($company);
-            } catch (\Exception $e) {
-                return new JsonResponse(['success' => false, 'error' => 'Company lookup error.'], 500);
-            }
+            $meeting->setCompany($company);
 
             $employeeIds = $request->request->all('employee_ids');
             if (is_array($employeeIds)) {
                 foreach ($employeeIds as $empId) {
-                    $employee = $employeeRepo->find($empId);
+                    // Validates that the requested employees actually belong to this user's company context
+                    $employee = $employeeRepo->findOneBy(['id' => $empId, 'company' => $company]);
                     if ($employee) {
                         $meeting->addEmployee($employee);
                     }
@@ -113,18 +114,21 @@ final class ManagementController extends AbstractController
         return new JsonResponse(['success' => false, 'error' => implode(', ', $errors)], 400);
     }
 
-    // Update Meeting with Automated Employee Email Notification Triggers
+    // Update Meeting with Automated Employee Email Notification Triggers and tenancy validation
     #[Route('/api/meetings/update', name: 'api_meetings_update', methods: ['POST'])]
     public function updateMeeting(Request $request, MeetingRepository $meetingRepo, EntityManagerInterface $em): JsonResponse
     {
+        $company = $this->getCompanyContext();
         $meetingId = $request->request->get('meeting_id');
+        
         if (!$meetingId) {
             return new JsonResponse(['success' => false, 'error' => 'Missing meeting identifier.'], 400);
         }
 
-        $meeting = $meetingRepo->find($meetingId);
+        // Ensures another logged-in company can't pass an ID and alter a meeting that isn't theirs
+        $meeting = $meetingRepo->findOneBy(['id' => $meetingId, 'company' => $company]);
         if (!$meeting) {
-            return new JsonResponse(['success' => false, 'error' => 'Meeting not found.'], 404);
+            return new JsonResponse(['success' => false, 'error' => 'Meeting not found or access denied.'], 404);
         }
 
         $oldStatus = $meeting->getStatus();
@@ -153,14 +157,16 @@ final class ManagementController extends AbstractController
         return new JsonResponse(['success' => false, 'error' => implode(', ', $errors)], 400);
     }
 
-    // Delete Meeting 
+    // Delete Meeting with data leak checks
     #[Route('/api/meetings/delete', name: 'api_meetings_delete', methods: ['POST'])]
     public function deleteMeeting(Request $request, MeetingRepository $meetingRepo, EntityManagerInterface $em): JsonResponse
     {
+        $company = $this->getCompanyContext();
         $data = json_decode($request->getContent(), true);
-        $meeting = $meetingRepo->find($data['id'] ?? null);
+        
+        $meeting = $meetingRepo->findOneBy(['id' => $data['id'] ?? null, 'company' => $company]);
         if (!$meeting) {
-            return new JsonResponse(['success' => false, 'error' => 'Meeting not found.'], 404);
+            return new JsonResponse(['success' => false, 'error' => 'Meeting not found or access denied.'], 404);
         }
 
         if ($meeting->getStatus() !== 'cancelled') {
@@ -172,11 +178,13 @@ final class ManagementController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    // Fetch employees associated with a specific meeting
+    // Fetch employees associated with a specific meeting with verification
     #[Route('/api/meetings/{id}/employees', name: 'api_meetings_employees', methods: ['GET'])]
     public function getMeetingEmployees(int $id, MeetingRepository $meetingRepo): JsonResponse
     {
-        $meeting = $meetingRepo->find($id);
+        $company = $this->getCompanyContext();
+        $meeting = $meetingRepo->findOneBy(['id' => $id, 'company' => $company]);
+        
         if (!$meeting) {
             return new JsonResponse([], 404);
         }
@@ -196,10 +204,13 @@ final class ManagementController extends AbstractController
         return new JsonResponse($data);
     }
 
-    // Fetching employees
+    // Fetching employees exclusively linked to your active company
     #[Route('/api/employees', name: 'api_employees', methods: ['GET'])]
     public function getEmployees(EmployeeRepository $repo): JsonResponse
     {
+        $company = $this->getCompanyContext();
+        $employees = $repo->findBy(['company' => $company], ['firstName' => 'ASC']);
+
         return new JsonResponse(array_map(function ($e) {
             return [
                 'id'         => $e->getId(),
@@ -209,13 +220,16 @@ final class ManagementController extends AbstractController
                 'department' => $e->getDepartment(),
                 'email'      => $e->getEmail(),
             ];
-        }, $repo->findAll()));
+        }, $employees));
     }
 
-    // Fetching clients
+    // Fetching clients exclusively linked to your active company
     #[Route('/api/clients', name: 'api_clients', methods: ['GET'])]
     public function getClients(ClientRepository $repo): JsonResponse
     {
+        $company = $this->getCompanyContext();
+        $clients = $repo->findBy(['company' => $company], ['clientName' => 'ASC']);
+
         return new JsonResponse(array_map(function ($c) {
             return [
                 'id'          => $c->getId(),
@@ -223,10 +237,10 @@ final class ManagementController extends AbstractController
                 'email'       => $c->getEmail(),
                 'status'      => $c->getStatus(),
             ];
-        }, $repo->findAll()));
+        }, $clients));
     }
 
-    // Client form 
+    // Client form pipeline 
     #[Route('/api/clients/validate-email', name: 'api_clients_validate_email', methods: ['POST'])]
     public function validateEmailPayload(Request $request): JsonResponse
     {
@@ -244,7 +258,7 @@ final class ManagementController extends AbstractController
         return new JsonResponse(['success' => false, 'error' => implode(', ', $errors)], 400);
     }
 
-    // Helper method for webhook distributions 
+    // Webhook broadcasting layout
     private function broadcastMeetingCancellation(Meeting $meeting): void
     {
         $webhookUrl = $this->getParameter('app.zapier_webhook');

@@ -1,0 +1,58 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Sales & Services{% endblock %}
+
+{% block page_title %}Sales & Services{% endblock %}
+{% set active_page = 'Sales & Services' %}
+
+{% block body %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 75vh;">
+    <div class="row justify-content-center w-100">
+        <div class="col-12 col-md-10 col-lg-8 text-center text-dark-forest">
+            
+            <div class="mb-4">
+                <span class="badge rounded-pill px-3 py-2 text-uppercase tracking-wider small" 
+                      style="background-color: rgba(56, 128, 135, 0.15); color: #388087; font-weight: 700; letter-spacing: 1px;">
+                    <i class="bi bi-pie-chart me-1"></i> Under Development
+                </span>
+            </div>
+
+            <h1 class="display-4 fw-bold mb-3" style="color: #0d1f1b;">
+                Sales & Services Portal
+            </h1>
+            
+            <p class="lead text-muted mx-auto mb-5" style="max-width: 630px; font-size: 1.15rem; line-height: 1.6;">
+                Track commercial growth pipelines, monitor premium subscription lifecycles, and gain real-time deal telemetry. This environment will integrate straight into your financial bookkeeping matrix.
+            </p>
+
+            <div class="row g-3 text-start justify-content-center mb-4">
+                <div class="col-12 col-sm-4">
+                    <div class="p-3 rounded-3 border-0 shadow-sm bg-white text-center h-100 transition-up">
+                        <i class="bi bi-graph-up-arrow mb-2 d-block" style="font-size: 1.75rem; color: #388087;"></i>
+                        <span class="fw-bold small text-dark d-block">Revenue Tracking</span>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <div class="p-3 rounded-3 border-0 shadow-sm bg-white text-center h-100 transition-up">
+                        <i class="bi bi-tags mb-2 d-block" style="font-size: 1.75rem; color: #388087;"></i>
+                        <span class="fw-bold small text-dark d-block">Service Catalogs</span>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <div class="p-3 rounded-3 border-0 shadow-sm bg-white text-center h-100 transition-up">
+                        <i class="bi bi-receipt-cutoff mb-2 d-block" style="font-size: 1.75rem; color: #388087;"></i>
+                        <span class="fw-bold small text-dark d-block">Invoice Pipelines</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <a href="/finance" class="btn px-4 py-2 rounded-3 shadow-sm text-white" style="background-color: #388087; transition: all 0.3s ease;">
+                    <i class="bi bi-wallet2 me-2"></i>Return to Finance
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
