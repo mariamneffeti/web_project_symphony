@@ -262,15 +262,15 @@
             <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
                    data-bs-toggle="dropdown">
-                    <img src="{{ asset('images/profile.png') }}"
-                         width="32" height="32" class="rounded-circle me-2" alt="Profile">
-                    <span class="d-none d-sm-inline">
-                        {% if app.user %}
-                            {{ app.user.getFirstName() }}
-                        {% else %}
-                            Guest
-                        {% endif %}
-                    </span>
+                    <img src="{{ app.user and app.user.image
+                    ? asset('uploads/' ~ app.user.image)
+                    : asset('images/profile.png') }}"
+                         width="32" height="32"
+                         class="rounded-circle me-2"
+                         alt="Profile">
+                        <span class="ms-2 d-none d-sm-inline">
+                            {{ app.user ? app.user.firstName : 'Guest' }}
+                        </span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="background-color: #212529;">
                     <li><a class="dropdown-item text-white" href="{{ path('profile_index') }}"><img src="{{ asset('images/profile.png') }}" width="32" height="32" class="rounded-circle me-2">Profil</a></li>
