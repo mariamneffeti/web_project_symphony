@@ -46,7 +46,7 @@ final class RegistrationController extends AbstractController
             $em->flush();
 
             return $this->redirectToRoute(
-                $user->getRole() === 'company' ? 'app_rh' : 'app_client'
+                $user->getRole() === 'company' ? 'employee_index' : 'app_client'
             );
         }
             return $this->render('registration/registration.html.twig', [
