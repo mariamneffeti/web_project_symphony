@@ -6,9 +6,6 @@ use App\Entity\Meeting;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Meeting>
- */
 class MeetingRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,30 @@ class MeetingRepository extends ServiceEntityRepository
         parent::__construct($registry, Meeting::class);
     }
 
-    //    /**
-    //     * @return Meeting[] Returns an array of Meeting objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findUpcomingForEmployee(int $employeeId): array
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.employees', 'e')
+            ->where('e.id = :eid')
+            ->andWhere('m.meetingDate >= :today')
+            ->andWhere('m.status = :status')
+            ->setParameter('eid', $employeeId)
+            ->setParameter('today', new \DateTime('today'))
+            ->setParameter('status', 'scheduled')
+            ->orderBy('m.meetingDate', 'ASC')
+            ->addOrderBy('m.meetingTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Meeting
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findByCompany(int $companyId): array
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.company', 'c')
+            ->where('c.id = :cid')
+            ->setParameter('cid', $companyId)
+            ->orderBy('m.meetingDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
