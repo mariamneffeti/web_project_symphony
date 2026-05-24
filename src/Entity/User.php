@@ -48,7 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = match ($this->role) {
             'employee' => ['ROLE_EMPLOYEE'],
             'company'  => ['ROLE_COMPANY'],
-            'admin'    => ['ROLE_ADMIN'],
+            'normal'    => ['ROLE_USER'],
             default    => ['ROLE_USER'],
         };
 
