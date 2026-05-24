@@ -1,0 +1,300 @@
+{# templates/client/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Client Dashboard{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+  background: #F6F6F2;
+  font-family: Inter, system-ui, sans-serif;
+  color: #1f2933;
+}
+.navbar { background: #388087; }
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.06);
+  transition: .3s ease;
+}
+.card:hover { transform: translateY(-4px); }
+.kpi { border-left: 6px solid #102E4A; }
+.btn-primary-custom { background: #388087; border: none; color: white; }
+.btn-primary-custom:hover { background: #2f6f75; color: white; }
+.table thead { background: #102E4A; color: white; }
+footer { background: linear-gradient(180deg, #388087, #0d1f1b); }
+a.footer-link,
+a.footer-link:link,
+a.footer-link:visited { color: rgba(255,255,255,0.8) !important; text-decoration: none; }
+a.footer-link:hover   { color: white !important; padding-left: 5px; }
+.toast-container { z-index: 1060 !important; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── Navbar ────────────────────────────────────────────────────────────────── #}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">Employee Dashboard</a>
+
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-center" id="nav">
+      <ul class="navbar-nav gap-4 fw-semibold">
+        <li class="nav-item"><a class="nav-link active" href="{{ path('client_index') }}">Clients</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('sales_index')}}">Sales</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('services_index')}}">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('stock_index')}}">Stock</a></li>
+      </ul>
+    </div>
+
+    <div class="d-flex align-items-center ms-auto">
+      <span class="text-white me-3">{{ app.user ? app.user.userIdentifier : 'Employee' }}</span>
+      <a href="#" class="btn btn-sm btn-outline-light">Logout</a>
+    </div>
+  </div>
+</nav>
+
+{# ── Main ──────────────────────────────────────────────────────────────────── #}
+<main class="container py-4">
+
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold">Client Portfolio Management</h1>
+      <p class="text-muted">Manage your relationships and churn predictions.</p>
+    </div>
+    <button class="btn btn-primary-custom" onclick="openAddModal()">+ Add New Client</button>
+  </header>
+
+  {# KPI Cards #}
+  <div class="row mb-4 g-3">
+    <div class="col-md-4">
+      <div class="card p-4 kpi">
+        <small class="text-muted fw-semibold">Total Clients</small>
+        <h4 class="fw-bold mb-0" id="total-clients-count">—</h4>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-4 kpi">
+        <small class="text-muted fw-semibold">Avg. Revenue</small>
+        <h4 class="fw-bold mb-0" id="stat-month-amount">—</h4>
+      </div>
+    </div>
+  </div>
+
+  {# Search & Export #}
+  <section class="d-flex gap-3 mb-4">
+    <div class="input-group w-50">
+      <input class="form-control" placeholder="Search by name, ID, or company…" oninput="handleSearch()">
+      <button class="btn btn-outline-secondary">🔍</button>
+    </div>
+    <button class="btn btn-outline-dark" onclick="ExportToCSV()">Export CSV</button>
+    <button class="btn btn-outline-dark" onclick="ExportToPDF()">Export PDF</button>
+    <button class="btn btn-outline-dark" onclick="Copy()">Copy</button>
+    <button class="btn btn-outline-dark" onclick="ExportToExcel()">Excel</button>
+  </section>
+
+  {# Client Table #}
+  <section class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th></th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="client-table-body">
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">Loading…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+{# ── Footer ────────────────────────────────────────────────────────────────── #}
+<footer class="text-white py-5" style="height:400px;">
+  <div class="container" style="margin-top:5rem;">
+    <div class="row gy-4">
+
+      <div class="col-lg-4 col-md-12">
+        <span class="fw-bold fs-4 text-uppercase">Entreprisa</span>
+      </div>
+
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Start your business</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Join us as a company leader</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Try Entreprisa</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">The Product</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Contact us</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Questions</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Blog</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Legal</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Privacy policy</a></li>
+        </ul>
+      </div>
+
+    </div>
+    <hr class="opacity-25">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-50 pt-3">
+      <p class="mb-0">© 2026 Entreprisa. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+{# ── Toast ─────────────────────────────────────────────────────────────────── #}
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="deleteToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">Action completed!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+{# ── Edit Modal ────────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Client Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-id-input">
+        <div class="mb-3">
+          <label for="edit-name-input" class="form-label">Client Name</label>
+          <input type="text" class="form-control" id="edit-name-input">
+        </div>
+        <div class="mb-3">
+          <label for="edit-email-input" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="edit-email-input">
+        </div>
+        <div class="mb-3">
+          <label for="edit-phone-input" class="form-label">Phone Number</label>
+          <input type="text" class="form-control" id="edit-phone-input">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary-custom" onclick="saveClientEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Detail Modal ──────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="detailClientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title">Client Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+               style="width:64px;height:64px;font-size:24px;">
+            <span id="det-initials">?</span>
+          </div>
+          <h4 class="mt-2 mb-0" id="det-name">Name</h4>
+          <span class="badge bg-info-subtle text-info" id="det-type">B2C</span>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Email:</span>
+            <strong id="det-email">-</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Phone:</span>
+            <strong id="det-phone">-</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span class="text-muted">Churn Risk:</span>
+            <strong id="det-risk">-</strong>
+          </li>
+          <li class="list-group-item">
+            <span class="text-muted d-block">Address:</span>
+            <div class="mt-1 p-2 bg-light rounded" id="det-address">No address provided.</div>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Add Modal ─────────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addModalLabel">Add New Client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="add-name-input" class="form-label">Client Name</label>
+          <input type="text" class="form-control" id="add-name-input" required>
+        </div>
+        <div class="mb-3">
+          <label for="add-email-input" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="add-email-input" required>
+        </div>
+        <div class="mb-3">
+          <label for="add-phone-input" class="form-label">Phone Number</label>
+          <input type="text" class="form-control" id="add-phone-input">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary-custom" onclick="saveNewClient()">Add Client</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{# ── Scripts ───────────────────────────────────────────────────────────────── #}
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const ROUTES = {
+    list:      "{{ path('client_api_list')       }}",
+    create:    "{{ path('client_api_create')     }}",
+    update:    "{{ path('client_api_update', {'id': '__ID__'}) }}",
+    delete:    "{{ path('client_api_delete', {'id': '__ID__'}) }}",
+};
+</script>
+
+<script src="{{ asset('js/clients.js') }}"></script>
+{% endblock %}
