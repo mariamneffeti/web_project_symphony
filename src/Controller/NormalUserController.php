@@ -4,27 +4,27 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Entity\User;
+use App\Form\ProfileType;
 use App\Repository\ArticleRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class NormalUserController extends AbstractController
 {
     // ─── MOCK USER ────────────────────────────────────────────────────────────
-    // TODO: remove this method and use $this->getUser() everywhere once login is wired up
     private function getMockOrRealUser(UserRepository $userRepository): ?User
     {
         $realUser = $this->getUser();
         if ($realUser instanceof User) {
-            return $realUser; // ← automatically used once login works
+            return $realUser;
         }
-
-        // Temporary mock: loads the first user from the DB (Yasmine from your seed data)
         return $userRepository->findOneBy(['email' => 'meriam.cherif2005@gmail.com']);
     }
     // ──────────────────────────────────────────────────────────────────────────
@@ -34,12 +34,12 @@ class NormalUserController extends AbstractController
         ArticleRepository $articleRepository,
         UserRepository $userRepository
     ): Response {
-        $articles  = $articleRepository->findBy([], ['arDate' => 'DESC'], 9);
-        $mockUser  = $this->getMockOrRealUser($userRepository);
+        $articles = $articleRepository->findBy([], ['arDate' => 'DESC'], 9);
+        $mockUser = $this->getMockOrRealUser($userRepository);
 
         return $this->render('normaluser/home.html.twig', [
-            'articles' => $articles,
-            'mock_user' => $mockUser,   // passed to Twig for the navbar
+            'articles'  => $articles,
+            'mock_user' => $mockUser,
         ]);
     }
 
@@ -48,42 +48,47 @@ class NormalUserController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher,
+        SluggerInterface $slugger,
         UserRepository $userRepository
     ): Response {
         /** @var User $user */
         $user = $this->getMockOrRealUser($userRepository);
 
-        if ($request->isMethod('POST')) {
-            $user->setFirstName($request->request->get('first_name'));
-            $user->setLastName($request->request->get('last_name'));
-            $user->setEmail($request->request->get('email'));
+        if (!$user) {
+            throw $this->createNotFoundException('User not found.');
+        }
 
-            $password = $request->request->get('password');
-            $confirm  = $request->request->get('confirm_password');
+        $form = $this->createForm(ProfileType::class, $user);
+        $form->handleRequest($request);
 
-            if (!empty($password)) {
-                if ($password !== $confirm) {
-                    $this->addFlash('error', 'Passwords do not match.');
-                    return $this->redirectToRoute('normal_user_profile');
-                }
-                $user->setPassword($hasher->hashPassword($user, $password));
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            // Handle password change
+            $plainPassword = $form->get('plainPassword')->getData();
+            if (!empty($plainPassword)) {
+                $user->setPassword($hasher->hashPassword($user, $plainPassword));
             }
 
-            $imageFile = $request->files->get('image');
+            // Handle image upload
+            $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
-                $allowed = ['image/jpeg', 'image/png', 'image/webp'];
-                if (!in_array($imageFile->getMimeType(), $allowed)) {
-                    $this->addFlash('error', 'Invalid image format. Use JPG, PNG or WEBP.');
-                    return $this->redirectToRoute('normal_user_profile');
-                }
-                if ($imageFile->getSize() > 2 * 1024 * 1024) {
-                    $this->addFlash('error', 'Image too large (max 2MB).');
-                    return $this->redirectToRoute('normal_user_profile');
-                }
+                $safeFilename = $slugger->slug($user->getFirstName() . '-' . $user->getLastName());
+                $newFilename  = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
-                $newFilename = uniqid('img_') . '.' . $imageFile->guessExtension();
-                $imageFile->move($this->getParameter('uploads_dir'), $newFilename);
-                $user->setImage($newFilename);
+                try {
+                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
+
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
+                    }
+
+                    $imageFile->move($uploadDir, $newFilename);
+                    $user->setImage($newFilename);
+
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Image upload failed: ' . $e->getMessage());
+                    return $this->redirectToRoute('normal_user_profile');
+                }
             }
 
             $em->flush();
@@ -92,6 +97,7 @@ class NormalUserController extends AbstractController
         }
 
         return $this->render('normaluser/profile.html.twig', [
+            'form' => $form->createView(),
             'user' => $user,
         ]);
     }

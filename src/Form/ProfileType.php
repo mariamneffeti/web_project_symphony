@@ -37,15 +37,6 @@ class ProfileType extends AbstractType
                 'attr'  => ['class' => 'form-control'],
                 'constraints' => [new NotBlank(), new Email()],
             ])
-            ->add('role', ChoiceType::class, [
-                'label'   => 'Role',
-                'choices' => [
-                    'Normal'   => 'normal',
-                    'Employee' => 'employee',
-                    'Company'  => 'company',
-                ],
-                'attr' => ['class' => 'form-select'],
-            ])
             ->add('plainPassword', RepeatedType::class, [
                 'type'            => PasswordType::class,
                 'mapped'          => false,
