@@ -136,6 +136,10 @@
 
 {% block body %}
 
+
+
+
+
     {# ══ HERO ══ #}
     <section class="hero-section" style="margin-top:56px; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80') no-repeat center / cover;">
         <div class="hero-animated-overlay">
@@ -155,6 +159,77 @@
             </div>
         </div>
     </section>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#aboutModal">
+        About Us
+    </button>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">About Entreprisa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="modal-body">
+
+                        {# Stats #}
+                        <div class="row text-center mb-4">
+                            <div class="col-4">
+                                <h3 class="counter" data-target="{{ userCount }}">0</h3>
+                                <p class="text-muted small">Companies</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 class="counter" data-target="{{ companyCount }}">0</h3>
+                                <p class="text-muted small">Users</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 class="counter" data-target="300">0</h3>
+                                <p class="text-muted small">Jobs Posted</p>
+                            </div>
+                        </div>
+
+                        {# Mission #}
+                        <div class="p-3 mb-4 rounded" style="border-left: 4px solid #388087; background: #f6f6f2;">
+                            <p class="mb-0 text-muted">Notre mission est de simplifier la gestion des équipes et connecter les entreprises avec leurs clients.</p>
+                        </div>
+
+                        {# Team #}
+                        <h6 class="text-center mb-3">Notre Équipe</h6>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <div class="text-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1" style="width:48px;height:48px;background:#e1f5ee;color:#0F6E56;font-weight:600;">HB</div>
+                                <div style="font-size:12px;font-weight:500;">Hedi</div>
+                                <div class="text-muted" style="font-size:11px;">Backend</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1" style="width:48px;height:48px;background:#e6f1fb;color:#185FA5;font-weight:600;">IL</div>
+                                <div style="font-size:12px;font-weight:500;">Ilef</div>
+                                <div class="text-muted" style="font-size:11px;">Frontend</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1" style="width:48px;height:48px;background:#faece7;color:#993C1D;font-weight:600;">AM</div>
+                                <div style="font-size:12px;font-weight:500;">Ahmed</div>
+                                <div class="text-muted" style="font-size:11px;">Dev</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1" style="width:48px;height:48px;background:#eeedfe;color:#534AB7;font-weight:600;">SM</div>
+                                <div style="font-size:12px;font-weight:500;">Sara</div>
+                                <div class="text-muted" style="font-size:11px;">Design</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1" style="width:48px;height:48px;background:#faeeda;color:#854F0B;font-weight:600;">KM</div>
+                                <div style="font-size:12px;font-weight:500;">Karim</div>
+                                <div class="text-muted" style="font-size:11px;">Dev</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {# ══ SERVICES ══ #}
     <section id="services" class="py-5">
@@ -307,5 +382,22 @@
             }
         });
 
+
+        document.getElementById('aboutModal').addEventListener('shown.bs.modal', function () {
+            document.querySelectorAll('.counter').forEach(counter => {
+                let count = 0;
+                const target = parseInt(counter.getAttribute('data-target'));
+                const step = target / 80;
+                const timer = setInterval(() => {
+                    count += step;
+                    if (count >= target) {
+                        counter.textContent = target + '+';
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.round(count);
+                    }
+                }, 16);
+            });
+        });
     </script>
 {% endblock %}
