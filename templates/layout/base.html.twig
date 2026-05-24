@@ -209,9 +209,16 @@
             z-index: 9999;
             max-width: 360px;
         }
-
         @media (max-width: 991px) {
-            .navbar-nav .dropdown-menu { right: 0; left: auto; }
+            .navbar-nav .dropdown-menu {
+                position: absolute !important; 
+                float: none;
+                right: 0;
+                left: auto;
+                margin-top: 10px;
+                background-color: #212529; 
+                min-width: 160px;
+            }
         }
     </style>
 
@@ -227,7 +234,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <img src="{{ asset('images/logoentreprisa.png') }}" height="46" width="64" alt="Logo">
+        <img src="{{ asset('image/logoentreprisa.png') }}" height="46" width="64" alt="Logo">
         <a class="navbar-brand ms-2" href="#">
             {% block page_title %}{% endblock %} Dashboard
         </a>
@@ -242,8 +249,8 @@
                     ['Stock',         'employee_index'],
                     ['Sales',         'employee_index'],
                     ['Management',    'employee_index'],
-                    ['Articles',      'employee_index'],
-                    ['Finance',       'employee_index'],
+                    ['Articles',      'article_index'],
+                    ['Finance',       'finance'],
                 ] %}
                 {% for item in nav %}
                     <li class="nav-item">
@@ -258,16 +265,16 @@
             <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
                    data-bs-toggle="dropdown">
-                    <img src="{{ asset('images/profile.png') }}"
+                    <img src="{{ asset('image/profile.png') }}"
                          width="32" height="32" class="rounded-circle me-2" alt="Profile">
                     <span class="d-none d-sm-inline">Admin</span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li><a class="dropdown-item" href="#">
-                            <i class="bi bi-person me-2"></i> Profil</a></li>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="background-color: #212529;">
+
+                    <li><a class="dropdown-item text-white" href="#"><img src="{{ asset('image/profile.png') }}" width="32" height="32" class="rounded-circle me-2">Profil</a></li>
                     <li><hr class="dropdown-divider border-secondary"></li>
-                    <li><a class="dropdown-item text-danger" href="#">
-                            <i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="#"><img src="{{ asset('image/logout.png') }}" width="24" class="me-2">Logout</a></li>
+
                 </ul>
             </div>
         </div>
@@ -289,8 +296,8 @@
                 ['bi-box-seam',     'Stock',      'employee_index'],
                 ['bi-cart',         'Sales',      'employee_index'],
                 ['bi-calendar-check','Management','employee_index'],
-                ['bi-newspaper',    'Articles',   'employee_index'],
-                ['bi-cash-stack',   'Finance',    'employee_index'],
+                ['bi-newspaper',    'Articles',   'article_index'],
+                ['bi-cash-stack',   'Finance',    'finance'],
             ] %}
             {% for item in sidebar %}
                 <li class="nav-item">
@@ -322,7 +329,7 @@
         <div class="row gy-4 text-center text-md-start">
             <div class="col-lg-4">
                 <div class="d-flex align-items-center gap-2 justify-content-center justify-content-md-start mb-3">
-                    <img src="{{ asset('images/logoentreprisa.png') }}" height="52" width="70" alt="Logo">
+                    <img src="{{ asset('image/logoentreprisa.png') }}" height="52" width="70" alt="Logo">
                     <span class="fw-bold fs-4 text-uppercase" style="font-family:'Syne',sans-serif;">Entreprisa</span>
                 </div>
                 <p class="opacity-60 small">Modern enterprise management platform<br>powered by AI & innovation.</p>

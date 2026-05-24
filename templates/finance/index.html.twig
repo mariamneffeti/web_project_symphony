@@ -1,10 +1,54 @@
-{% extends 'baseCompany.html.twig' %}
+{% extends 'layout/base.html.twig' %}
 
 {% block title %}Finance{% endblock %}
 
-{% block stylesheet %}<link rel="stylesheet" href="{{ asset('css/finance.css') }}">{% endblock %}
+{% block stylesheets %}<link rel="stylesheet" href="{{ asset('css/finance.css') }}">
+<style>
+    :root {
+        --primary-teal: #388087;
+        --dark-forest: #0d1f1b;
+        --bg-light: #F6F6F2;
+        --accent-blue: #102E4A;
+    }
+    .stats-card {
+            background: white;
+            border: none;
+            border-left: 5px solid var(--primary-teal);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
 
-{% block page_title %}Finance Dashboard{% endblock %}
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .table-custom {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table-custom thead {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-finance {
+            background-color: var(--primary-teal);
+            color: white;
+            border: none;
+            transition: opacity 0.3s;
+        }
+
+        .btn-finance:hover {
+            background-color: var(--dark-forest);
+            color: white;
+        }
+</style>
+{% endblock %}
+
+{% block page_title %}Finance{% endblock %}
+{% set active_page = 'Finance' %}
 
 {% block body %}
 
@@ -75,45 +119,62 @@
 
             <h2 class="h4 mb-4 fw-bold" style="color: #102E4A;">Add Transaction</h2>
 
-            <form id="transaction-form" method="POST" class="row g-3">
+            {{ form_start(expenseForm, {
+                attr: {
+                    id: 'transaction-form',
+                    class: 'row g-3'
+                }
+            }) }}
 
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Date</label>
-                    <input type="date" name="date" class="form-control" required>
-                </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">Date</label>
+                {{ form_widget(expenseForm.expenseDate, {
+                    attr: {
+                        class: 'form-control'
+                    }
+                }) }}
+            </div>
 
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Type</label>
-                    <select name="type" class="form-select" required>
-                        <option value="Salary">Salary</option>
-                        <option value="Supply">Supply</option>
-                        <option value="Rent">Rent</option>
-                        <option value="Tools">Tools</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">Type</label>
+                {{ form_widget(expenseForm.category, {
+                    attr: {
+                        class: 'form-select'
+                    }
+                }) }}
+            </div>
 
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Amount</label>
-                    <input type="number" name="amount" class="form-control" step="0.01" required>
-                </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">Amount</label>
+                {{ form_widget(expenseForm.amount, {
+                    attr: {
+                        class: 'form-control'
+                    }
+                }) }}
+            </div>
 
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold">Description</label>
-                    <input type="text" name="description" class="form-control">
-                </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Description</label>
+                {{ form_widget(expenseForm.description, {
+                    attr: {
+                        class: 'form-control'
+                    }
+                }) }}
+            </div>
 
-                <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-finance px-5 py-2 rounded-pill mt-3">
-                        <i class="bi bi-plus-circle me-2"></i>Add Transaction
-                    </button>
-                </div>
+            <div class="col-12 text-end">
+                <button type="submit"
+                        class="btn btn-finance px-5 py-2 rounded-pill mt-3">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Add Transaction
+                </button>
+            </div>
 
-            </form>
+            {{ form_end(expenseForm) }}
 
         </div>
     </section>
+
 
     <section id="transactions" class="mb-5">
 
@@ -217,4 +278,7 @@
 </div>
 {% endblock %}
 
-{% block javascripts %}<script src="{{ asset('js/finance.js') }}"></script>{% endblock %}
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/finance.js') }}"></script>
+{% endblock %}

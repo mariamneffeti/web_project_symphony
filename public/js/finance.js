@@ -4,39 +4,57 @@ document.addEventListener("DOMContentLoaded", () => {
   let financeChart;
 
   async function loadFinanceChart(year) {
-    const ctx = document.getElementById("financeChart");
-    if (!ctx) return;
+  const ctx = document.getElementById("financeChart");
+  if (!ctx) return;
 
-    const res = await fetch(`/finance/chart?year=${year}`);
-    const result = await res.json();
+  const res = await fetch(`/finance/chart?year=${year}`);
+  const result = await res.json();
 
-    const labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const expenseData = new Array(12).fill(0);
+  const labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-    result.data.expenses.forEach(e => {
-      expenseData[e.month - 1] = parseFloat(e.total);
-    });
+  const expenseData = new Array(12).fill(0);
+  const salesData = new Array(12).fill(0);
 
-    if (financeChart) financeChart.destroy();
+  result.data.expenses.forEach(e => {
+    expenseData[e.month - 1] = parseFloat(e.total);
+  });
 
-    financeChart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
+  result.data.sales.forEach(s => {
+    salesData[s.month - 1] = parseFloat(s.total);
+  });
+
+  if (financeChart) financeChart.destroy();
+
+  financeChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
           label: "Expenses",
           data: expenseData,
           borderColor: "#102E4A",
-          fill: true,
+          fill: false,
           tension: 0.4
-        }]
+        },
+        {
+          label: "Sales",
+          data: salesData,
+          borderColor: "#388087",
+          fill: false,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom" },
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-  }
+    }
+  });
+}
 
   // KPIs
   async function loadFinanceKPIs() {
@@ -68,11 +86,90 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Add transaction
+  const form = document.getElementById("transaction-form");
+
+  form?.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    try {
+
+      const res = await fetch("/finance/add", {
+        method: "POST",
+        body: new FormData(form)
+      });
+
+      const result = await res.json();
+
+      if (result.status !== "success") {
+        console.error(result.message);
+        return;
+      }
+
+      const exp = result.expense;
+
+      const row = document.createElement("tr");
+
+      let badgeClass = "badge-other";
+
+      if (exp.category === "Rent") {
+        badgeClass = "badge-rent";
+      }
+      else if (exp.category === "Salary") {
+        badgeClass = "badge-salary";
+      }
+      else if (exp.category === "Tools") {
+        badgeClass = "badge-tools";
+      }
+      else if (exp.category === "Marketing") {
+        badgeClass = "badge-marketing";
+      }
+      else if (exp.category === "Supply") {
+        badgeClass = "badge-supplies";
+      }
+
+      row.innerHTML = `
+        <td>${exp.date}</td>
+
+        <td>
+          <span class="badge ${badgeClass}">
+            ${exp.category}
+          </span>
+        </td>
+
+        <td class="fw-bold">
+          ${exp.amount} Dt
+        </td>
+
+        <td>
+          ${exp.description ?? ""}
+        </td>
+      `;
+
+      tableBody.prepend(row);
+
+      allRows.unshift(row);
+
+      form.reset();
+
+      loadFinanceKPIs();
+      loadFinanceChart(yearFilter.value);
+
+      visible = step;
+      updateTable();
+
+    } catch (e) {
+      console.error("Add transaction error", e);
+    }
+
+  });
+
   // Table filters
   const tableBody = document.getElementById("transaction-list");
   if (!tableBody) return;
 
-  const allRows = Array.from(tableBody.querySelectorAll("tr"));
+  let allRows = Array.from(tableBody.querySelectorAll("tr"));
 
   const filterType = document.getElementById("filter-type");
   const filterStart = document.getElementById("filter-date-start");
