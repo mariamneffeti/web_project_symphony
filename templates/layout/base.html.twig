@@ -211,12 +211,12 @@
         }
         @media (max-width: 991px) {
             .navbar-nav .dropdown-menu {
-                position: absolute !important; 
+                position: absolute !important;
                 float: none;
                 right: 0;
                 left: auto;
                 margin-top: 10px;
-                background-color: #212529; 
+                background-color: #212529;
                 min-width: 160px;
             }
         }
@@ -271,9 +271,9 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="background-color: #212529;">
 
-                    <li><a class="dropdown-item text-white" href="#"><img src="{{ asset('images/profile.png') }}" width="32" height="32" class="rounded-circle me-2">Profil</a></li>
+                    <li><a class="dropdown-item text-white" href="{{ path('profile_index') }}"><img src="{{ asset('image/profile.png') }}" width="32" height="32" class="rounded-circle me-2">Profil</a></li>
                     <li><hr class="dropdown-divider border-secondary"></li>
-                    <li><a class="dropdown-item text-danger" href="#"><img src="{{ asset('images/logout.png') }}" width="24" class="me-2">Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><img src="{{ asset('image/logout.png') }}" width="24" class="me-2">Logout</a></li>
 
                 </ul>
             </div>
