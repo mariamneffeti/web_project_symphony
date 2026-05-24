@@ -13,6 +13,10 @@ final class LoginController extends AbstractController
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 2a8e51d8a1007dbcbf1b767348d9ddbad6de6898
         /** @var User|null $user */
         $user = $this->getUser();
 
@@ -27,6 +31,12 @@ final class LoginController extends AbstractController
         }
 
         $error        = $authenticationUtils->getLastAuthenticationError();
+<<<<<<< HEAD
+=======
+=======
+        $error = $authenticationUtils->getLastAuthenticationError();
+>>>>>>> 3bbcf2c0ed251fe0eadf006f6371cc12e77ac804
+>>>>>>> 2a8e51d8a1007dbcbf1b767348d9ddbad6de6898
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('login/index.html.twig', [
