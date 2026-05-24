@@ -17,7 +17,6 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── Hero cover ──────────────────────────────────────────── */
         .article-hero {
             position: relative;
             height: 220px;
@@ -49,8 +48,6 @@
             line-height: 1.3;
             margin: 0;
         }
-
-        /* ── Detail body ─────────────────────────────────────────── */
         .detail-body { padding: 2rem; }
 
         .detail-item {
@@ -85,7 +82,6 @@
 
         .detail-value { font-weight: 500; color: #1a1a1a; line-height: 1.6; }
 
-        /* ── Category pill ───────────────────────────────────────── */
         .cat-pill {
             display: inline-block;
             font-size: .78rem;
@@ -103,7 +99,6 @@
     <main class="container page-content">
         <div class="detail-card card shadow-sm">
 
-            {# ── Hero ──────────────────────────────────────────────────── #}
             <div class="article-hero">
                 {% if article.arImage %}
                     <img src="{{ article.arImage }}" alt="cover"
@@ -117,7 +112,6 @@
                 </div>
             </div>
 
-            {# ── Body ──────────────────────────────────────────────────── #}
             <div class="detail-body">
 
                 <div class="detail-item">

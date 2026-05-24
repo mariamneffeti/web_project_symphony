@@ -38,7 +38,6 @@ class Article
     #[ORM\Column(name: 'company_id')]
     private ?int $companyId = null;
 
-    // ── Getters / Setters ───────────────────────────────────────────
 
     public function getId(): ?int { return $this->id; }
 

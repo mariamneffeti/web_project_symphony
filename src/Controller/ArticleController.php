@@ -15,7 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/articles', name: 'article_')]
 class ArticleController extends AbstractController
 {
-    // ── LIST + ADD ──────────────────────────────────────────────────
     #[Route('', name: 'index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
@@ -27,7 +26,7 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $article->setCompanyId(1); // replace with session company id
+            $article->setCompanyId(1);
 
             $em->persist($article);
             $em->flush();
@@ -71,14 +70,12 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    // ── VIEW ────────────────────────────────────────────────────────
     #[Route('/{id}', name: 'view', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function view(Article $article): Response
     {
         return $this->render('article/view.html.twig', ['article' => $article]);
     }
 
-    // ── EDIT ────────────────────────────────────────────────────────
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, Article $article, EntityManagerInterface $em): Response
     {
@@ -102,7 +99,6 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    // ── DELETE ──────────────────────────────────────────────────────
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Article $article, EntityManagerInterface $em): JsonResponse
     {

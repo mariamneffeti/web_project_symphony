@@ -26,7 +26,6 @@ class ProfileController extends AbstractController
         UserRepository              $userRepo
     ): Response {
 
-        // Récupérer l'utilisateur (temporaire — remplacer par $this->getUser() avec auth)
         $user = $userRepo->find(1);
 
         if (!$user) {
@@ -45,13 +44,11 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // ── Mot de passe ────────────────────────────────────
             $plainPassword = $form->get('plainPassword')->getData();
             if (!empty($plainPassword)) {
                 $user->setPassword($hasher->hashPassword($user, $plainPassword));
             }
 
-            // ── Upload image ────────────────────────────────────
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
                 $safeFilename = $slugger->slug($user->getFirstName() . '-' . $user->getLastName());
