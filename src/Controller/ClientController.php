@@ -11,24 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/client', name: 'client_')]
-#[IsGranted('ROLE_USER')]
-
+#[Route('/clients', name: 'client_')]
 class ClientController extends AbstractController
 {
-    #[Route('/dashboard', name: 'dashboard')]
-    public function dashboard(): Response
-    {
-        /** @var User $currentUser */
-        $currentUser = $this->getUser();
-
-        return $this->render('client/index.html.twig', [
-            'user' => $currentUser,
-        ]);
-    }
-
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
@@ -36,6 +22,7 @@ class ClientController extends AbstractController
 
         return $this->render('client/index.html.twig');
     }
+
 
     #[Route('/api/list', name: 'api_list', methods: ['GET'])]
     public function list(ClientRepository $repo): JsonResponse

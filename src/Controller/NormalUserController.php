@@ -18,28 +18,16 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class NormalUserController extends AbstractController
 {
-    // ─── MOCK USER ────────────────────────────────────────────────────────────
-    private function getMockOrRealUser(UserRepository $userRepository): ?User
-    {
-        $realUser = $this->getUser();
-        if ($realUser instanceof User) {
-            return $realUser;
-        }
-        return $userRepository->findOneBy(['email' => 'meriam.cherif2005@gmail.com']);
-    }
-    // ──────────────────────────────────────────────────────────────────────────
-
     #[Route('/normaluser/home', name: 'normal_user_home')]
-    public function home(
-        ArticleRepository $articleRepository,
-        UserRepository $userRepository
-    ): Response {
+    public function home(ArticleRepository $articleRepository): Response
+    {
+        /** @var User $user */
+        $user     = $this->getUser();
         $articles = $articleRepository->findBy([], ['arDate' => 'DESC'], 9);
-        $mockUser = $this->getMockOrRealUser($userRepository);
 
         return $this->render('normaluser/home.html.twig', [
-            'articles'  => $articles,
-            'mock_user' => $mockUser,
+            'articles' => $articles,
+            'user'     => $user,
         ]);
     }
 
@@ -47,12 +35,10 @@ class NormalUserController extends AbstractController
     public function profile(
         Request $request,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $hasher,
-        SluggerInterface $slugger,
-        UserRepository $userRepository
+        UserPasswordHasherInterface $hasher
     ): Response {
         /** @var User $user */
-        $user = $this->getMockOrRealUser($userRepository);
+        $user = $this->getUser();
 
         if (!$user) {
             throw $this->createNotFoundException('User not found.');

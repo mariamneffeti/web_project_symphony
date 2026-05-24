@@ -14,13 +14,12 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): RedirectResponse
     {
-        $user = $token->getUser();
-        $roles = $user->getRoles();
+        $roles = $token->getUser()->getRoles();
 
-        return match(true) {
-    in_array('ROLE_COMPANY', $roles)  => new RedirectResponse($this->router->generate('company_dashboard')),
-    in_array('ROLE_EMPLOYEE', $roles) => new RedirectResponse($this->router->generate('employee_dashboard')),
-    default                           => new RedirectResponse($this->router->generate('client_dashboard')),
-};
+        return match (true) {
+            in_array('ROLE_COMPANY',  $roles) => new RedirectResponse($this->router->generate('company_dashboard')),
+            in_array('ROLE_EMPLOYEE', $roles) => new RedirectResponse($this->router->generate('employee_dashboard')),
+            default                           => new RedirectResponse($this->router->generate('normal_user_home')),
+        };
     }
 }
