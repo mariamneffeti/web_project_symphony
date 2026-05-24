@@ -6,7 +6,7 @@
 
 {% block stylesheets %}
     <style>
-        /* ── Animations ──────────────────────────────────────────── */
+
         .add-card { animation: slideDown .4s ease both; }
 
         @keyframes slideDown {
@@ -14,7 +14,6 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── Section title ───────────────────────────────────────── */
         .section-title {
             font-family: 'Syne', sans-serif;
             font-weight: 700;
@@ -34,7 +33,7 @@
             flex-shrink: 0;
         }
 
-        /* ── Category badges ─────────────────────────────────────── */
+
         .cat-badge {
             display: inline-block;
             font-size: .72rem;
@@ -51,7 +50,7 @@
         .cat-CompanyNews  { background: #fef3c7; color: #92400e; }
         .cat-default      { background: rgba(56,128,135,.12); color: var(--teal); }
 
-        /* ── Image thumbnail ─────────────────────────────────────── */
+
         .img-thumb {
             width: 48px; height: 36px;
             object-fit: cover;
@@ -68,7 +67,7 @@
             font-size: .9rem;
         }
 
-        /* ── Search bar ──────────────────────────────────────────── */
+
         .search-wrap { position: relative; }
         .search-wrap .bi-search {
             position: absolute;
@@ -79,7 +78,7 @@
         }
         .search-wrap input { padding-left: 2.2rem; }
 
-        /* ── Link cell ───────────────────────────────────────────── */
+
         .link-cell {
             max-width: 160px;
             overflow: hidden;
@@ -89,7 +88,7 @@
             color: var(--teal);
         }
 
-        /* ── Action buttons ──────────────────────────────────────── */
+
         .btn-action {
             padding: .3rem .65rem;
             font-size: .78rem;
@@ -97,7 +96,7 @@
             border-radius: 6px;
         }
 
-        /* ── Empty state ─────────────────────────────────────────── */
+
         .empty-state {
             padding: 3rem 1rem;
             color: #9ba4ac;
@@ -105,7 +104,7 @@
         }
         .empty-state i { font-size: 2.5rem; display: block; margin-bottom: .75rem; }
 
-        /* ── Toast ───────────────────────────────────────────────── */
+
         #toast-container {
             position: fixed;
             bottom: 24px; right: 24px;
@@ -138,65 +137,61 @@
 {% block body %}
     <main class="container page-content">
 
-        {# ── Add Article form ───────────────────────────────────────── #}
         <section class="card stats-card p-4 mb-5 add-card">
             <h3 class="section-title mb-4">Add New Article</h3>
 
-            <form id="articleForm" novalidate>
-                <div class="row g-3">
+            {{ form_start(form, {
+                'attr': {'id': 'articleForm', 'novalidate': 'novalidate'},
+                'action': path('article_index'),
+                'method': 'POST'
+            }) }}
 
-                    <div class="col-md-6">
-                        {{ form_label(form.title) }}
-                        {{ form_widget(form.title) }}
-                        {{ form_errors(form.title) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.category) }}
-                        {{ form_widget(form.category) }}
-                        {{ form_errors(form.category) }}
-                    </div>
-
-                    <div class="col-md-12">
-                        {{ form_label(form.description) }}
-                        {{ form_widget(form.description) }}
-                        {{ form_errors(form.description) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.authorName) }}
-                        {{ form_widget(form.authorName) }}
-                        {{ form_errors(form.authorName) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.arDate) }}
-                        {{ form_widget(form.arDate) }}
-                        {{ form_errors(form.arDate) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.link) }}
-                        {{ form_widget(form.link) }}
-                        {{ form_errors(form.link) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.arImage) }}
-                        {{ form_widget(form.arImage) }}
-                        {{ form_errors(form.arImage) }}
-                    </div>
-
-                    <div class="col-12 d-flex justify-content-end">
-                        <button type="submit" class="btn btn-teal px-5 py-2 fw-semibold">
-                            <i class="bi bi-send me-2"></i>Publish Article
-                        </button>
-                    </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title) }}
+                    {{ form_errors(form.title) }}
                 </div>
-            </form>
+                <div class="col-md-6">
+                    {{ form_label(form.category) }}
+                    {{ form_widget(form.category) }}
+                    {{ form_errors(form.category) }}
+                </div>
+                <div class="col-md-12">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.authorName) }}
+                    {{ form_widget(form.authorName) }}
+                    {{ form_errors(form.authorName) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.arDate) }}
+                    {{ form_widget(form.arDate) }}
+                    {{ form_errors(form.arDate) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.link) }}
+                    {{ form_widget(form.link) }}
+                    {{ form_errors(form.link) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.arImage) }}
+                    {{ form_widget(form.arImage) }}
+                    {{ form_errors(form.arImage) }}
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-teal px-5 py-2 fw-semibold">
+                        <i class="bi bi-send me-2"></i>Publish Article
+                    </button>
+                </div>
+            </div>
+
+            {{ form_end(form) }}
         </section>
 
-        {# ── Search / Filter ────────────────────────────────────────── #}
         <section class="row mb-4 g-2 align-items-end">
             <div class="col-md-5">
                 <div class="search-wrap">
@@ -211,24 +206,9 @@
                     <i class="bi bi-search me-1"></i>Search
                 </button>
             </div>
-            <div class="col-md-3">
-                <select id="categoryFilter" class="form-select">
-                    <option value="">Filter by category…</option>
-                    <option value="Technology"    {% if category == 'Technology'    %}selected{% endif %}>Technology</option>
-                    <option value="Data & AI"     {% if category == 'Data & AI'     %}selected{% endif %}>Data &amp; AI</option>
-                    <option value="Cybersecurity" {% if category == 'Cybersecurity' %}selected{% endif %}>Cybersecurity</option>
-                    <option value="HR & Careers"  {% if category == 'HR & Careers'  %}selected{% endif %}>HR &amp; Careers</option>
-                    <option value="Company News"  {% if category == 'Company News'  %}selected{% endif %}>Company News</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button id="filterBtn" class="btn btn-teal w-100 fw-semibold">
-                    <i class="bi bi-funnel me-1"></i>Filter
-                </button>
-            </div>
+
         </section>
 
-        {# ── Articles table ──────────────────────────────────────────── #}
         <section class="card stats-card p-4 mb-5">
             <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
                 <h3 class="section-title mb-0">Article List</h3>
@@ -325,7 +305,7 @@
 
 {% block javascripts %}
     <script>
-        /* ── Toast helper ─────────────────────────────────────────── */
+
         function toast(msg, type = 'success') {
             const c  = document.getElementById('toast-container');
             const el = document.createElement('div');
@@ -335,20 +315,11 @@
             setTimeout(() => el.remove(), 3500);
         }
 
-        /* ── Add Article (AJAX) ───────────────────────────────────── */
+
         document.getElementById('articleForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Build FormData from Symfony-named fields
-            const fd = new FormData();
-            const g  = name => this.querySelector(`[name$="[${name}]"]`)?.value ?? '';
-            fd.append('article[title]',       g('title'));
-            fd.append('article[category]',    g('category'));
-            fd.append('article[description]', g('description'));
-            fd.append('article[authorName]',  g('authorName'));
-            fd.append('article[arDate]',      g('arDate'));
-            fd.append('article[link]',        g('link'));
-            fd.append('article[arImage]',     g('arImage'));
+            const fd = new FormData(this);
 
             try {
                 const res  = await fetch('{{ path("article_index") }}', {
@@ -369,7 +340,6 @@
             }
         });
 
-        /* ── Delete (AJAX) ────────────────────────────────────────── */
         document.getElementById('articleTableBody').addEventListener('click', async function(e) {
             const btn = e.target.closest('.btn-delete');
             if (!btn) return;
@@ -400,7 +370,6 @@
             }
         });
 
-        /* ── Live search (client-side) ────────────────────────────── */
         document.getElementById('searchInput').addEventListener('keyup', function() {
             const q    = this.value.toLowerCase();
             const rows = document.querySelectorAll('#articleTableBody tr[data-id]');
@@ -409,16 +378,11 @@
             });
         });
 
-        /* ── Search button (server-side) ──────────────────────────── */
         document.getElementById('searchBtn').addEventListener('click', function() {
             const q = document.getElementById('searchInput').value;
             window.location.href = `{{ path('article_index') }}?search=${encodeURIComponent(q)}`;
         });
 
-        /* ── Category filter (server-side) ───────────────────────── */
-        document.getElementById('filterBtn').addEventListener('click', function() {
-            const cat = document.getElementById('categoryFilter').value;
-            window.location.href = `{{ path('article_index') }}?category=${encodeURIComponent(cat)}`;
-        });
+
     </script>
 {% endblock %}

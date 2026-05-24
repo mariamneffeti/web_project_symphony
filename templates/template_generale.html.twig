@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {#  <title>{% block title %}Entreprisa{% endblock %}</title>#}
+
+    {# Bootstrap & Icons #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@700;800&family=Roboto+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    {# Base styles — always loaded on every page #}
+    <style>
+
+
+        :root {
+            --primary-teal: #388087;
+            --dark-forest: #0d1f1b;
+            --bg-light: #F6F6F2;
+            --accent-blue: #102E4A;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Inter', sans-serif;
+            color: #111;
+        }
+
+        {#   /* ── NAVBAR ── */
+        .custom-navbar { background: linear-gradient(90deg, #388087, #0d1f1b); }
+        .dropdown-toggle::after { display: none !important; }
+        .dropdown-menu { border-radius: 8px; padding: 8px 0; background-color: #212529; }
+        .dropdown-item { font-weight: 500; transition: background 0.2s; color: white; }
+        .dropdown-item:hover { background-color: rgba(255,255,255,0.1); color: white; }
+
+        /* ── FOOTER ── */
+        .footer-forest {
+            background: linear-gradient(180deg, #388087 0%, #0d1f1b 100%);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Inter', sans-serif;
+        }
+        .footer-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .footer-link:hover { color: #fff; padding-left: 5px; }
+        .footer-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; }
+
+        /* ── BACK TO TOP ── */
+        #backToTop {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            padding: 10px 16px;
+            border: none;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            font-size: 0.85rem;
+            z-index: 999;
+            transition: background 0.2s;
+        }
+        #backToTop:hover { background: #0a1e30; } #}
+    </style>
+
+    {# Child pages add their own <style> tags here #}
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+
+{# ══ NAVBAR ══
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark custom-navbar">
+    <div class="container-fluid">
+        <button class="navbar-toggler me-2" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <img src="{{ asset('images/logoentreprisa.png') }}" height="50" width="70" alt="Logo" />
+        <a class="navbar-brand fw-bold h1 ms-2" href="{{ path('app_home') }}">Entreprisa</a>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav mx-auto gap-3">
+                <li class="nav-item">
+                    <a class="nav-link {% block nav_home %}{% endblock %}" href="{{ path('app_home') }}" style="font-family:Inter;font-size:1.1rem;">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contact" style="font-family:Inter;font-size:1.1rem;">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#services" style="font-family:Inter;font-size:1.1rem;">Services</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="navbar-nav ms-auto d-flex flex-row gap-2 align-items-center">
+            <a href="#" class="nav-link text-white">Login</a>
+            <a href="{{ path('app_registration') }}" class="btn btn-sm"
+               style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">
+                Register
+            </a>
+        </div>
+    </div>
+</nav>
+
+ ══ OFFCANVAS SIDEBAR ══
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar"
+     style="background-color:#0d1f1b;color:white;">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title fw-bold">ENTREPRISA</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column gap-3">
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center" href="{{ path('app_home') }}">
+                    <i class="bi bi-house me-3"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center" href="#contact">
+                    <i class="bi bi-info-circle me-3"></i> About
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center" href="#services">
+                    <i class="bi bi-grid me-3"></i> Services
+                </a>
+            </li>
+            <li class="nav-item mt-3 border-top border-secondary pt-3">
+                <a class="nav-link text-white d-flex align-items-center" href="#">
+                    <i class="bi bi-box-arrow-in-right me-3"></i> Login
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white d-flex align-items-center" href="{{ path('app_registration') }}">
+                    <i class="bi bi-person-plus me-3"></i> Register
+                </a>
+            </li>
+        </ul>
+    </div>
+</div> #}
+
+{# ══ PAGE CONTENT ══ #}
+{% block body %}  {% endblock %}
+
+{# ══ FOOTER ══
+<footer class="footer-forest text-white py-5" id="contact">
+    <div class="container" style="margin-top:5rem;">
+        <div class="row gy-4">
+
+            <div class="col-lg-4 col-md-12">
+                <div class="footer-brand">
+                    <img src="{{ asset('images/logoentreprisa.png') }}" height="60" width="80" alt="Logo" />
+                    <span class="fw-bold fs-4 text-uppercase">Entreprisa</span>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-2">
+                <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Start<br>your business</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="#" class="footer-link"><i class="bi bi-cloud-plus me-2"></i>Join us as a company leader</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="footer-link"><i class="bi bi-bar-chart me-2"></i>Try Entreprisa</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-2">
+                <h6 class="text-uppercase small fw-bold mb-3 opacity-50">The Product</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="footer-link">Contact us</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Questions</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Blog</a></li>
+                </ul>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-2">
+                <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Legal</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+                    <li class="mb-2"><a href="#" class="footer-link">Privacy policy</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <hr class="opacity-25 mt-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-50 pt-3">
+            <p class="mb-0">© {{ "now"|date("Y") }} Entreprisa. All rights reserved.</p>
+            <ul class="list-inline mb-0">
+                <li class="list-inline-item me-3"><a href="#" class="text-white text-decoration-none">Privacy</a></li>
+                <li class="list-inline-item me-3"><a href="#" class="text-white text-decoration-none">Terms</a></li>
+                <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Cookies</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<button id="backToTop">⇧ Top</button>
+#}
+<script>
+    const btn = document.getElementById("backToTop");
+    window.addEventListener("scroll", () => {
+        btn.style.display = window.scrollY > 200 ? "block" : "none";
+    });
+    btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+</script>
+
+{% block javascripts %}
+
+        <script>
+            const toggle = document.getElementById('themeToggle');
+
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                toggle.textContent = '☀️ Light Mode';
+            }
+
+            toggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+
+                if (document.body.classList.contains('dark-mode')) {
+                    toggle.textContent = '☀️ Light Mode';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    toggle.textContent = '🌙 Dark Mode';
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        </script>
+
+{% endblock %}
+
+</body>
+</html>

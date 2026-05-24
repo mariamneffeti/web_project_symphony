@@ -11,7 +11,6 @@
 
 {% block stylesheets %}
     <style>
-        /* ── Page animation ──────────────────────────────────────── */
         .profile-wrapper {
             animation: fadeUp .45s ease both;
         }
@@ -21,7 +20,7 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── Left card ───────────────────────────────────────────── */
+
         .profile-banner {
             background: linear-gradient(135deg, var(--forest) 0%, var(--teal) 100%);
             height: 140px;
@@ -30,7 +29,7 @@
             overflow: hidden;
         }
 
-        /* Decorative circles on banner */
+
         .profile-banner::before,
         .profile-banner::after {
             content: '';
@@ -49,7 +48,6 @@
             bottom: -30px; left: 20px;
         }
 
-        /* ── Avatar ──────────────────────────────────────────────── */
         .avatar-wrap {
             margin-top: -70px;
             display: inline-block;
@@ -68,7 +66,6 @@
             display: block;
         }
 
-        /* ── Role badge ──────────────────────────────────────────── */
         .role-badge {
             display: inline-block;
             font-size: .72rem;
@@ -83,7 +80,6 @@
         .role-company  { background: #d1fae5; color: #065f46; }
         .role-normal   { background: rgba(56,128,135,.12); color: var(--teal); }
 
-        /* ── Meta rows ───────────────────────────────────────────── */
         .meta-row {
             display: flex;
             align-items: center;
@@ -120,7 +116,7 @@
             word-break: break-all;
         }
 
-        /* ── Right card / form ───────────────────────────────────── */
+
         .settings-card {
             border-left: 4px solid var(--teal) !important;
         }
@@ -146,7 +142,6 @@
 
         .form-label { font-weight: 600; font-size: .855rem; color: var(--navy); }
 
-        /* ── Password reveal toggle ──────────────────────────────── */
         .pw-wrap { position: relative; }
 
         .pw-wrap .pw-toggle {
@@ -165,7 +160,6 @@
         .pw-wrap .pw-toggle:hover { color: var(--teal); }
         .pw-wrap input { padding-right: 2.5rem; }
 
-        /* ── Image preview ────────────────────────────────────────── */
         #imagePreviewWrap {
             display: none;
             margin-top: .5rem;
@@ -178,7 +172,6 @@
             border: 2px solid var(--teal);
         }
 
-        /* ── Save button ─────────────────────────────────────────── */
         .btn-save {
             background: var(--teal);
             color: white;
@@ -192,7 +185,6 @@
 
         .btn-save:hover { background: var(--teal-dark); color: white; transform: translateY(-1px); }
 
-        /* ── Toast ───────────────────────────────────────────────── */
         #toast-container {
             position: fixed;
             bottom: 24px; right: 24px;
@@ -226,7 +218,6 @@
     <main class="container page-content">
         <div class="row profile-wrapper g-4">
 
-            {# ── LEFT — avatar card ────────────────────────────────────── #}
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0 h-100">
 
@@ -286,7 +277,6 @@
                 </div>
             </div>
 
-            {# ── RIGHT — settings form ─────────────────────────────────── #}
             <div class="col-lg-8">
                 <div class="card shadow-sm p-4 h-100 settings-card">
 
@@ -315,7 +305,6 @@
 
                     <div class="row g-3">
 
-                        {# Name #}
                         <div class="col-md-6">
                             {{ form_label(form.firstName) }}
                             {{ form_widget(form.firstName) }}
@@ -327,21 +316,18 @@
                             {{ form_errors(form.lastName) }}
                         </div>
 
-                        {# Email #}
                         <div class="col-12">
                             {{ form_label(form.email) }}
                             {{ form_widget(form.email) }}
                             {{ form_errors(form.email) }}
                         </div>
 
-                        {# Role #}
                         <div class="col-12">
                             {{ form_label(form.role) }}
                             {{ form_widget(form.role) }}
                             {{ form_errors(form.role) }}
                         </div>
 
-                        {# Divider #}
                         <div class="col-12">
                             <hr class="opacity-15">
                             <p class="small text-muted mb-0">
@@ -350,11 +336,10 @@
                             </p>
                         </div>
 
-                        {# Password #}
                         <div class="col-md-6">
                             {{ form_label(form.plainPassword.first) }}
                             <div class="pw-wrap">
-                                {{ form_widget(form.plainPassword.first, {'attr': {'id': 'pw1'}}) }}
+                                {{ form_widget(form.plainPassword.first, {'attr': {'id': 'pw1', 'class': 'form-control'}}) }}
                                 <button type="button" class="pw-toggle" onclick="togglePw('pw1', this)">
                                     <i class="bi bi-eye"></i>
                                 </button>
@@ -365,7 +350,7 @@
                         <div class="col-md-6">
                             {{ form_label(form.plainPassword.second) }}
                             <div class="pw-wrap">
-                                {{ form_widget(form.plainPassword.second, {'attr': {'id': 'pw2'}}) }}
+                                {{ form_widget(form.plainPassword.second, {'attr': {'id': 'pw2', 'class': 'form-control'}}) }}
                                 <button type="button" class="pw-toggle" onclick="togglePw('pw2', this)">
                                     <i class="bi bi-eye"></i>
                                 </button>
@@ -373,20 +358,18 @@
                             {{ form_errors(form.plainPassword.second) }}
                         </div>
 
-                        {# Image upload #}
                         <div class="col-md-6">
                             {{ form_label(form.imageFile) }}
-                            {{ form_widget(form.imageFile, {'attr': {'id': 'imageFileInput'}}) }}
+                            {{ form_widget(form.imageFile) }}
                             {{ form_errors(form.imageFile) }}
-                            <div id="imagePreviewWrap">
-                                <img id="imagePreview" src="" alt="Preview">
+                            <div id="imagePreviewWrap" style="display:none; align-items:center; margin-top:.5rem;">
+                                <img id="imagePreview" src="" alt="Preview" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:2px solid var(--teal);">
                                 <span class="ms-2 small text-muted">Preview</span>
                             </div>
                         </div>
 
                     </div>
 
-                    {# Actions #}
                     <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top border-light">
                         <a href="{{ path('employee_index') }}"
                            class="btn btn-outline-secondary fw-semibold px-4">
@@ -409,7 +392,6 @@
 
 {% block javascripts %}
     <script>
-        /* ── Password toggle ─────────────────────────────────────── */
         function togglePw(inputId, btn) {
             const input = document.getElementById(inputId);
             const icon  = btn.querySelector('i');
@@ -422,27 +404,24 @@
             }
         }
 
-        /* ── Image preview + live avatar update ──────────────────── */
+
         document.getElementById('imageFileInput').addEventListener('change', function() {
             const file = this.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Small preview below the input
                 const wrap    = document.getElementById('imagePreviewWrap');
                 const preview = document.getElementById('imagePreview');
                 preview.src   = e.target.result;
                 wrap.style.display = 'flex';
                 wrap.style.alignItems = 'center';
 
-                // Live update the avatar in the left card
                 document.getElementById('avatarDisplay').src = e.target.result;
             };
             reader.readAsDataURL(file);
         });
 
-        /* ── Live name update in left card ───────────────────────── */
         function liveUpdate(selector, targets) {
             const el = document.querySelector(selector);
             if (!el) return;
@@ -459,7 +438,7 @@
         liveUpdate('[name$="[firstName]"]', ['h4.fw-bold']);
         liveUpdate('[name$="[lastName]"]',  ['h4.fw-bold']);
 
-        /* ── Toast helper (for flash-free AJAX if needed later) ──── */
+
         function toast(msg, type = 'success') {
             const c  = document.getElementById('toast-container');
             const el = document.createElement('div');
@@ -469,7 +448,6 @@
             setTimeout(() => el.remove(), 3500);
         }
 
-        /* ── Auto-dismiss flash alerts after 4 s ─────────────────── */
         document.querySelectorAll('.alert').forEach(alert => {
             setTimeout(() => {
                 const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);

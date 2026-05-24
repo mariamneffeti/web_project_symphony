@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Controller;
-
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\Employee;
 use App\Form\EmployeeType;
 use App\Repository\EmployeeRepository;
@@ -15,27 +17,62 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/employees', name: 'employee_')]
 class EmployeeController extends AbstractController
 {
-    // ─────────────────────────────────────────────────────────────────
-    //  LIST + ADD (main RH page)
-    // ─────────────────────────────────────────────────────────────────
     #[Route('', name: 'index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         EmployeeRepository $repo,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        UserRepository $userRepo,
+        UserPasswordHasherInterface $hasher
     ): Response {
         $employee = new Employee();
         $form = $this->createForm(EmployeeType::class, $employee);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle AJAX JSON submission
+            $existingUser = $userRepo->findOneBy(['email' => $employee->getEmail()]);
+            if ($existingUser && $request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'status'  => 'error',
+                    'message' => 'A user with this email already exists.'
+                ]);
+            }
+            $tempPassword = 'Emp@' . rand(1000, 9999);
+            $user = new User();
+            $user->setFirstName($employee->getFirstName());
+            $user->setLastName('NN');
+            $user->setEmail($employee->getEmail());
+            $user->setRole('employee');
+            $user->setPassword($hasher->hashPassword($user, $tempPassword));
+            $em->persist($user);
+            $em->flush();
             if ($request->isXmlHttpRequest()) {
                 $employee->setLastName('NN');
                 $employee->setHireDate(new \DateTime());
                 $employee->setUserId(1);
                 $employee->setCompanyId(1);
+                $cvFile = $request->files->get('cv_file');
+                if ($cvFile) {
+                    $allowedMimes = ['application/pdf', 'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
+                    if (!in_array($cvFile->getMimeType(), $allowedMimes)) {
+                        return new JsonResponse(['status' => 'error', 'message' => 'Invalid file format.']);
+                    }
+
+                    if ($cvFile->getSize() > 5 * 1024 * 1024) {
+                        return new JsonResponse(['status' => 'error', 'message' => 'File too large (max 5MB).']);
+                    }
+
+                    $cvDir      = $this->getParameter('kernel.project_dir') . '/public/uploads/cv';
+                    if (!is_dir($cvDir)) {
+                        mkdir($cvDir, 0755, true);
+                    }
+
+                    $newFilename = uniqid('cv_') . '.' . $cvFile->guessExtension();
+                    $cvFile->move($cvDir, $newFilename);
+                    $employee->setCvPath('uploads/cv/' . $newFilename);
+                }
                 $em->persist($employee);
                 $em->flush();
 
@@ -46,7 +83,6 @@ class EmployeeController extends AbstractController
                 ]);
             }
 
-            // Normal form submission fallback
             $employee->setLastName('NN');
             $employee->setHireDate(new \DateTime());
             $employee->setUserId(1);
@@ -59,7 +95,6 @@ class EmployeeController extends AbstractController
             return $this->redirectToRoute('employee_index');
         }
 
-        // AJAX validation error response
         if ($form->isSubmitted() && $request->isXmlHttpRequest()) {
             $errors = [];
             foreach ($form->getErrors(true) as $error) {
@@ -78,9 +113,6 @@ class EmployeeController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  VIEW
-    // ─────────────────────────────────────────────────────────────────
     #[Route('/{id}', name: 'view', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function view(Employee $employee): Response
     {
@@ -89,9 +121,6 @@ class EmployeeController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  EDIT
-    // ─────────────────────────────────────────────────────────────────
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, Employee $employee, EntityManagerInterface $em): Response
     {
@@ -114,14 +143,14 @@ class EmployeeController extends AbstractController
             'employee' => $employee,
         ]);
     }
-
-    // ─────────────────────────────────────────────────────────────────
-    //  DELETE (POST / AJAX)
-    // ─────────────────────────────────────────────────────────────────
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function delete(Request $request, Employee $employee, EntityManagerInterface $em): JsonResponse
+    public function delete(Request $request, Employee $employee, EntityManagerInterface $em , UserRepository $userRepo): JsonResponse
     {
         if ($this->isCsrfTokenValid('delete_employee_' . $employee->getId(), $request->request->get('_token'))) {
+            $user = $userRepo->findOneBy(['email' => $employee->getEmail()]);
+            if ($user) {
+                $em->remove($user);
+            }
             $em->remove($employee);
             $em->flush();
             return new JsonResponse(['status' => 'success', 'message' => 'Employee deleted successfully']);

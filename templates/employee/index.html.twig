@@ -7,7 +7,7 @@
 
 {% block stylesheets %}
     <style>
-        /* ── Add-form card ─────────────────────────────────────── */
+
         .add-card {
             animation: slideDown .4s ease both;
         }
@@ -17,7 +17,6 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── Section headings ───────────────────────────────────── */
         .section-title {
             font-family: 'Syne', sans-serif;
             font-weight: 700;
@@ -37,7 +36,6 @@
             flex-shrink: 0;
         }
 
-        /* ── Badge ──────────────────────────────────────────────── */
         .badge-active {
             background: #d1f5e4;
             color: #1a7a4a;
@@ -48,7 +46,6 @@
             padding: .3em .75em;
         }
 
-        /* ── Search bar ─────────────────────────────────────────── */
         .search-wrap { position: relative; }
         .search-wrap .bi-search {
             position: absolute;
@@ -59,7 +56,6 @@
         }
         .search-wrap input { padding-left: 2.2rem; }
 
-        /* ── Action buttons ─────────────────────────────────────── */
         .btn-action {
             padding: .3rem .65rem;
             font-size: .78rem;
@@ -67,7 +63,6 @@
             border-radius: 6px;
         }
 
-        /* ── Empty state ─────────────────────────────────────────── */
         .empty-state {
             padding: 3rem 1rem;
             color: #9ba4ac;
@@ -76,7 +71,6 @@
 
         .empty-state i { font-size: 2.5rem; display: block; margin-bottom: .75rem; }
 
-        /* ── Toast ───────────────────────────────────────────────── */
         #toast-container {
             position: fixed;
             bottom: 24px; right: 24px;
@@ -109,60 +103,68 @@
 {% block body %}
     <main class="container page-content">
 
-        {# ── Add Employee ───────────────────────────────────────────── #}
         <section class="card stats-card p-4 mb-5 add-card">
             <h3 class="section-title mb-4">Add New Employee</h3>
 
-            <form id="employeeForm" novalidate>
-                <div class="row g-3">
+            {{ form_start(form, {
+                'attr': {'id': 'employeeForm', 'novalidate': 'novalidate'},
+                'action': path('employee_index'),
+                'method': 'POST'
+            }) }}
 
-                    <div class="col-md-6">
-                        {{ form_label(form.firstName) }}
-                        {{ form_widget(form.firstName) }}
-                        {{ form_errors(form.firstName) }}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form_label(form.firstName) }}
+                    {{ form_widget(form.firstName) }}
+                    {{ form_errors(form.firstName) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.department) }}
+                    {{ form_widget(form.department) }}
+                    {{ form_errors(form.department) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.position) }}
+                    {{ form_widget(form.position) }}
+                    {{ form_errors(form.position) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.email) }}
+                    {{ form_widget(form.email) }}
+                    {{ form_errors(form.email) }}
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">CV</label>
+                    <div class="input-group">
+                        <input type="file"
+                               name="cv_file"
+                               id="cvFileInput"
+                               class="form-control"
+                               accept=".pdf,.doc,.docx">
                     </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.department) }}
-                        {{ form_widget(form.department) }}
-                        {{ form_errors(form.department) }}
+                    <div class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Accepted formats: PDF, DOC, DOCX
                     </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.position) }}
-                        {{ form_widget(form.position) }}
-                        {{ form_errors(form.position) }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form_label(form.email) }}
-                        {{ form_widget(form.email) }}
-                        {{ form_errors(form.email) }}
-                    </div>
-
-                    {# CV upload field #}
-                    <div class="col-md-12">
-                        <label class="form-label fw-semibold">CV</label>
-                        <div class="input-group">
-                            <input type="text" id="cvPathInput" name="cv_path"
-                                   class="form-control" placeholder="No CV uploaded yet" readonly>
-                            <button type="button" class="btn btn-teal" onclick="alert('CV upload page coming soon')">
-                                <i class="bi bi-upload me-1"></i> Upload CV
-                            </button>
-                        </div>
-                        <div class="form-text text-muted">Click "Upload CV" to attach a CV file.</div>
-                    </div>
-
-                    <div class="col-12 d-flex justify-content-end">
-                        <button type="submit" class="btn btn-teal px-5 py-2 fw-semibold">
-                            <i class="bi bi-person-plus me-2"></i>Add Employee
-                        </button>
+                    <div id="cvPreview" style="display:none; margin-top:.5rem;">
+                    <span class="badge" style="background:rgba(56,128,135,.12);color:var(--teal);padding:.4em .8em;border-radius:8px;font-size:.8rem;">
+                        <i class="bi bi-file-earmark-text me-1"></i>
+                        <span id="cvFileName"></span>
+                    </span>
                     </div>
                 </div>
-            </form>
+
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-teal px-5 py-2 fw-semibold">
+                        <i class="bi bi-person-plus me-2"></i>Add Employee
+                    </button>
+                </div>
+            </div>
+
+            {{ form_end(form) }}
         </section>
 
-        {# ── Search / Filter ────────────────────────────────────────── #}
         <section class="row mb-4 g-2 align-items-end">
             <div class="col-md-6">
                 <div class="search-wrap">
@@ -172,20 +174,11 @@
                            value="{{ search }}">
                 </div>
             </div>
-            <div class="col-md-4">
-                <select id="filterSelect" class="form-select">
-                    <option selected>Filter by…</option>
-                    <option>Department</option>
-                    <option>Position</option>
-                    <option>Status</option>
-                </select>
-            </div>
             <div class="col-md-2">
                 <button id="applyBtn" class="btn btn-teal w-100 fw-semibold">Apply</button>
             </div>
         </section>
 
-        {# ── Employee Table ──────────────────────────────────────────── #}
         <section class="card stats-card p-4 mb-5">
             <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
                 <h3 class="section-title mb-0">Employee List</h3>
@@ -261,7 +254,6 @@
 
 {% block javascripts %}
     <script>
-        /* ── helpers ──────────────────────────────────────────────── */
         function toast(msg, type = 'success') {
             const c = document.getElementById('toast-container');
             const el = document.createElement('div');
@@ -270,21 +262,30 @@
             c.appendChild(el);
             setTimeout(() => el.remove(), 3500);
         }
+        document.getElementById('cvFileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
 
-        /* ── Add Employee ─────────────────────────────────────────── */
+            if (file.size > 5 * 1024 * 1024) {
+                toast('File too large (max 5MB).', 'error');
+                this.value = '';
+                return;
+            }
+
+            document.getElementById('cvFileName').textContent = file.name;
+            document.getElementById('cvPreview').style.display = 'block';
+        });
+
+
         document.getElementById('employeeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const data = new FormData();
-            data.append('employee[firstName]', this.querySelector('[name$="[firstName]"]').value);
-            data.append('employee[department]', this.querySelector('[name$="[department]"]').value);
-            data.append('employee[position]',   this.querySelector('[name$="[position]"]').value);
-            data.append('employee[email]',      this.querySelector('[name$="[email]"]').value);
+            const fd = new FormData(this);
 
             try {
                 const res  = await fetch('{{ path("employee_index") }}', {
                     method: 'POST',
-                    body: data,
+                    body: fd,
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 const json = await res.json();
@@ -295,12 +296,12 @@
                 } else {
                     toast(json.message || 'An error occurred.', 'error');
                 }
-            } catch (err) {
+            } catch {
                 toast('Network error while adding employee.', 'error');
             }
         });
 
-        /* ── Delete ───────────────────────────────────────────────── */
+
         document.getElementById('employeeTableBody').addEventListener('click', async function(e) {
             const btn = e.target.closest('.btn-delete');
             if (!btn) return;
@@ -331,7 +332,7 @@
             }
         });
 
-        /* ── Live search ──────────────────────────────────────────── */
+
         document.getElementById('searchInput').addEventListener('keyup', function() {
             const q    = this.value.toLowerCase();
             const rows = document.querySelectorAll('#employeeTableBody tr[data-id]');
@@ -340,10 +341,5 @@
             });
         });
 
-        /* ── Apply filter (server-side) ───────────────────────────── */
-        document.getElementById('applyBtn').addEventListener('click', function() {
-            const q = document.getElementById('searchInput').value;
-            window.location.href = `{{ path('employee_index') }}?search=${encodeURIComponent(q)}`;
-        });
     </script>
 {% endblock %}
