@@ -239,15 +239,15 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto gap-2">
                 {% set nav = [
-                    ['Home',          'company_homeCompany'],
-                    ['Employees',     'company_employee_index'],
-                    ['Clients',       'company_client_index'],
-                    ['Recruitment',   'company_recruitment'],
-                    ['Stock',         'company_stock'],
-                    ['Sales & Services', 'company_sales'],
-                    ['Management',    'company_management'],
-                    ['Articles',      'company_article_index'],
-                    ['Finance',       'company_finance'],
+                    ['Home',          'homeCompany'],
+                    ['Employees',     'employee_index'],
+                    ['Clients',       'client_index'],
+                    ['Recruitment',   'recruitement'],
+                    ['Stock',         'stock_index'],
+                    ['Sales & Services', 'sales_index'],
+                    ['Management',    'management'],
+                    ['Articles',      'article_index'],
+                    ['Finance',       'finance'],
                 ] %}
                 {% for item in nav %}
                     <li class="nav-item">
@@ -290,15 +290,15 @@
     <div class="offcanvas-body">
         <ul class="nav flex-column gap-2">
             {% set sidebar = [
-                ['bi-house',        'Home',       'company_homeCompany'],
-                ['bi-people',       'Employees',  'company_employee_index'],
-                ['bi-people-fill',  'Clients',    'company_client_index'],
-                ['bi-person-plus',  'Recruitment','company_recruitment'],
-                ['bi-box-seam',     'Stock',      'company_stock'],
-                ['bi-cart',         'Sales & Services',      'company_sales'],
-                ['bi-calendar-check','Management','company_management'],
-                ['bi-newspaper',    'Articles',   'company_article_index'],
-                ['bi-cash-stack',   'Finance',    'company_finance'],
+                ['bi-house',        'Home',       'homeCompany'],
+                ['bi-people',       'Employees',  'employee_index'],
+                ['bi-people-fill',  'Clients',    'client_index'],
+                ['bi-person-plus',  'Recruitment','recruitement'],
+                ['bi-box-seam',     'Stock',      'stock_index'],
+                ['bi-cart',         'Sales & Services',      'sales_index'],
+                ['bi-calendar-check','Management','management'],
+                ['bi-newspaper',    'Articles',   'article_index'],
+                ['bi-cash-stack',   'Finance',    'finance'],
             ] %}
             {% for item in sidebar %}
                 <li class="nav-item">
