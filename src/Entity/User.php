@@ -37,7 +37,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Company::class)]
     private ?Company $company = null;
 
-    // Security methods
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -48,7 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = match ($this->role) {
             'employee' => ['ROLE_EMPLOYEE'],
             'company'  => ['ROLE_COMPANY'],
-            'normal'    => ['ROLE_USER'],
+            'admin'    => ['ROLE_ADMIN'],
             default    => ['ROLE_USER'],
         };
 
@@ -59,7 +58,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
-        // Clear temporary sensitive data here if needed later
     }
 
     public function getId(): ?int

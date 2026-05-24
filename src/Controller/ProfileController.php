@@ -22,21 +22,13 @@ class ProfileController extends AbstractController
         Request                     $request,
         EntityManagerInterface      $em,
         UserPasswordHasherInterface $hasher,
-        SluggerInterface            $slugger,
-        UserRepository              $userRepo
+        SluggerInterface            $slugger
     ): Response {
-
-        $user = $userRepo->find(1);
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
 
         if (!$user) {
-            $user = new User();
-            $user->setFirstName('Admin');
-            $user->setLastName('User');
-            $user->setEmail('admin@entreprisa.com');
-            $user->setRole('company');
-            $user->setPassword('temp');
-            $em->persist($user);
-            $em->flush();
+            return $this->redirectToRoute('app_login');
         }
 
         $form = $this->createForm(ProfileType::class, $user);
@@ -54,23 +46,17 @@ class ProfileController extends AbstractController
                 $safeFilename = $slugger->slug($user->getFirstName() . '-' . $user->getLastName());
                 $newFilename  = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
 
-                try {
-                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
-
-                    if (!is_dir($uploadDir)) {
-                        mkdir($uploadDir, 0755, true);
-                    }
-
-                    $imageFile->move($uploadDir, $newFilename);
-                    $user->setImage($newFilename);
-
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Image upload failed: ' . $e->getMessage());
-                    return $this->redirectToRoute('profile_index');
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
                 }
+
+                $imageFile->move($uploadDir, $newFilename);
+                $user->setImage($newFilename);
             }
 
             $em->flush();
+
             $this->addFlash('success', 'Profile updated successfully.');
             return $this->redirectToRoute('profile_index');
         }

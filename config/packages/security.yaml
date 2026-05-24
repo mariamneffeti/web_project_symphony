@@ -1,7 +1,9 @@
 security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         App\Entity\User: 'auto'
 
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         app_user_provider:
             entity:
@@ -18,20 +20,15 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
-                success_handler: App\Security\LoginSuccessHandler
+                default_target_path: app_home
             logout:
                 path: app_logout
                 target: app_login
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
-                always_remember_me: true
 
-    access_control:
-    - { path: ^/login,    roles: PUBLIC_ACCESS }
-    - { path: ^/company,  roles: ROLE_COMPANY  } 
-    - { path: ^/employee, roles: ROLE_EMPLOYEE }
-    - { path: ^/client,   roles: ROLE_USER     }
+    access_control: []
 
 when@test:
     security:
@@ -41,9 +38,7 @@ when@test:
                 cost: 4
                 time_cost: 3
                 memory_cost: 10
-        firewalls:
-            main:
-                form_login:
-                    login_path: app_login
-                    check_path: app_login
-                    success_handler: App\Security\LoginSuccessHandler
+        form_login:
+            login_path: app_login
+            check_path: app_login
+            success_handler: App\Security\LoginSuccess
