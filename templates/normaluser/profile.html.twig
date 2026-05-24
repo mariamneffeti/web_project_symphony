@@ -1,0 +1,189 @@
+{% extends 'normaluser/baseclient.html.twig' %}
+gir
+{% block title %}Profile{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .page-content { padding-top: 100px; }
+
+        .profile-header {
+            background: linear-gradient(135deg, #0d1f1b 0%, #388087 100%);
+            height: 150px;
+            border-radius: 15px 15px 0 0;
+        }
+        .profile-avatar-container {
+            margin-top: -75px;
+            padding: 5px;
+            background: white;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.06);
+            transition: 0.3s ease;
+        }
+
+        .btn-save {
+            background-color: #388087;
+            border: none;
+            color: white;
+            transition: background 0.3s;
+        }
+        .btn-save:hover { background-color: #2f6f75; color: white; }
+
+        .footer-forest {
+            background: linear-gradient(180deg, #388087 0%, #0d1f1b 100%);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .footer-link:hover { color: #fff; padding-left: 5px; }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    <main class="container page-content mt-4 mb-5">
+        <div class="row">
+
+            {# ── LEFT: Avatar card ── #}
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="profile-header"></div>
+                    <div class="card-body text-center">
+                        <div class="profile-avatar-container">
+                            {% if user.image %}
+                                <img src="{{ asset('uploads/' ~ user.image) }}"
+                                     alt="Avatar" class="profile-avatar">
+                            {% else %}
+                                <img src="{{ asset('images/profile.png') }}"
+                                     alt="Avatar" class="profile-avatar">
+                            {% endif %}
+                        </div>
+
+                        <h4 class="fw-bold mt-3">
+                            {{ user.firstName }} _ {{ user.lastName }}
+                        </h4>
+
+                        <span class="badge bg-success mb-3">{{ user.roles[0] ?? 'User' }}</span>
+
+                        <hr class="opacity-25">
+
+                        <div class="text-start px-3">
+                            <p class="small mb-1 text-uppercase fw-bold opacity-50">Email</p>
+                            <p class="mb-3">{{ user.email }}</p>
+
+                            <p class="small mb-1 text-uppercase fw-bold opacity-50">Department</p>
+                            <p class="mb-0">{{ user.roles[0] ?? '—' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── RIGHT: Edit form ── #}
+            <div class="col-lg-8">
+                <div class="card shadow-sm p-4 h-100" style="border-left:4px solid #388087;">
+                    <h3 class="mb-4">Account Settings</h3>
+
+                    <form method="POST" action="{{ path('normal_user_profile') }}"
+                          enctype="multipart/form-data" class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">First Name</label>
+                            <input name="first_name" type="text" class="form-control"
+                                   value="{{ user.firstName }}" placeholder="First name" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Last Name</label>
+                            <input name="last_name" type="text" class="form-control"
+                                   value="{{ user.lastName }}" placeholder="Last name" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Email</label>
+                            <input name="email" type="email" class="form-control"
+                                   value="{{ user.email }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">New Password</label>
+                            <input name="password" type="password" class="form-control"
+                                   placeholder="••••••••">
+                            <div class="form-text">Leave blank to keep current password.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Confirm Password</label>
+                            <input name="confirm_password" type="password" class="form-control"
+                                   placeholder="••••••••">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Profile Picture</label>
+                            <input type="file" name="image" class="form-control"
+                                   accept="image/jpeg,image/png,image/webp">
+                            <div class="form-text">JPG, PNG or WEBP — max 2 MB.</div>
+                        </div>
+
+                        <div class="col-12 text-end mt-4">
+                            <a href="{{ path('normal_user_home') }}"
+                               class="btn btn-outline-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-save px-4">
+                                Save Changes
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    {# ══════════════════ FOOTER ══════════════════ #}
+    <footer class="footer-forest text-white py-5">
+        <div class="container">
+            <div class="row gy-4 text-center text-md-start">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-3">
+                        <img src="{{ asset('images/logoentreprisa.png') }}" height="60" width="80" alt="Logo">
+                        <span class="fw-bold fs-4 text-uppercase">Entreprisa</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Division</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="footer-link">Services & AI</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Communications</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-4">
+                    <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Support</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="footer-link">Technical Help</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">IT Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="opacity-25 mt-4">
+            <div class="text-center small opacity-50">
+                <p class="mb-0">© 2026 Entreprisa Inc. – Services & AI Division</p>
+            </div>
+        </div>
+    </footer>
+
+{% endblock %}
