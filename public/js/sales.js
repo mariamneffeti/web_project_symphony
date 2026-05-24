@@ -1,24 +1,15 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────────────────────────────────────
 let allTransactions = [];
 let revenueChart    = null;
 
-// Filter state
 let filterType      = 'all';
 let filterSearch    = '';
 let filterStartDate = '';
 let filterEndDate   = '';
 
-// Pagination state
 let currentPage  = 1;
 let totalPages   = 1;
 let totalRecords = 0;
 const PER_PAGE   = 20;
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     // Set today as default sale date in modal
     const saleDateInput = document.getElementById('sale-date');
@@ -31,12 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bindModal();
     loadClientsForModal();
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
-
-/** Fetch wrapper — redirects on 401 */
 async function sessionFetch(url, options = {}) {
     const response = await fetch(url, options);
     if (response.status === 401) {
@@ -47,14 +32,12 @@ async function sessionFetch(url, options = {}) {
     return response;
 }
 
-/** Build a Symfony route URL replacing __ID__ placeholder */
 function route(name, id = null) {
     let url = ROUTES[name];
     if (id !== null) url = url.replace('__ID__', id);
     return url;
 }
 
-/** Build list/stats URL with query params */
 function buildUrl(base, params = {}) {
     const url = new URL(base, window.location.href);
     Object.entries(params).forEach(([k, v]) => {
@@ -69,9 +52,6 @@ const fmt = n =>
 const fmtDate = d =>
     d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : '—';
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────────────────────────────────────────
 function showToast(message, type = 'info') {
     const colors = { success: '#198754', error: '#dc3545', warning: '#e6a817', info: '#388087' };
     const toast = document.createElement('div');
@@ -90,9 +70,6 @@ function showToast(message, type = 'info') {
     }, 3500);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  KPI STATS
-// ─────────────────────────────────────────────────────────────────────────────
 async function loadStats() {
     try {
         const res = await sessionFetch(route('salesStats')).then(r => r.json());
@@ -125,9 +102,6 @@ function updateStatusKPIs() {
     if (pendingVal) pendingVal.textContent = pending;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  LOAD TRANSACTIONS  (server-side pagination + filters)
-// ─────────────────────────────────────────────────────────────────────────────
 async function loadTransactions(page = 1) {
     currentPage = page;
 
@@ -148,11 +122,9 @@ async function loadTransactions(page = 1) {
 
         if (!listRes.success) throw new Error(listRes.error || 'Failed to load sales');
 
-        // Update pagination meta
         totalPages   = listRes.pagination?.total_pages ?? 1;
         totalRecords = listRes.pagination?.total        ?? 0;
 
-        // Fetch details for each sale on this page
         allTransactions = [];
 
         const details = await Promise.all(
@@ -196,7 +168,6 @@ async function loadTransactions(page = 1) {
                 });
             }
 
-            // Fallback: sale with no items
             if (!d.product_items?.length && !d.service_items?.length) {
                 allTransactions.push({
                     _id:     `sale-${d.id}`,
@@ -222,14 +193,10 @@ async function loadTransactions(page = 1) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  TABLE RENDER
-// ─────────────────────────────────────────────────────────────────────────────
 function renderTable() {
     const tbody = document.getElementById('transaction-table-body');
     tbody.innerHTML = '';
 
-    // Client-side type filter (server handles search + date)
     let rows = filterType === 'all'
         ? allTransactions
         : allTransactions.filter(t => t._type === filterType);
@@ -275,15 +242,11 @@ function renderTable() {
         tbody.appendChild(tr);
     });
 
-    // Bind status badge clicks
     document.querySelectorAll('.status-badge').forEach(badge =>
         badge.addEventListener('click', () => toggleStatus(badge.dataset.id))
     );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  PAGINATION
-// ─────────────────────────────────────────────────────────────────────────────
 function renderPagination() {
     const info     = document.getElementById('pagination-info');
     const controls = document.getElementById('pagination-controls');
@@ -295,14 +258,12 @@ function renderPagination() {
 
     controls.innerHTML = '';
 
-    // Previous
     const prevLi = document.createElement('li');
     prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
     prevLi.innerHTML = `<a class="page-link" href="#">&laquo;</a>`;
     prevLi.addEventListener('click', e => { e.preventDefault(); if (currentPage > 1) loadTransactions(currentPage - 1); });
     controls.appendChild(prevLi);
 
-    // Page numbers (show window of 5)
     const start = Math.max(1, currentPage - 2);
     const end   = Math.min(totalPages, start + 4);
 
@@ -315,7 +276,6 @@ function renderPagination() {
         controls.appendChild(li);
     }
 
-    // Next
     const nextLi = document.createElement('li');
     nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
     nextLi.innerHTML = `<a class="page-link" href="#">&raquo;</a>`;
@@ -323,9 +283,6 @@ function renderPagination() {
     controls.appendChild(nextLi);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  STATUS TOGGLE
-// ─────────────────────────────────────────────────────────────────────────────
 async function toggleStatus(id) {
     const tx = allTransactions.find(t => t._id === id);
     if (!tx) return;
@@ -345,7 +302,6 @@ async function toggleStatus(id) {
         }).then(r => r.json());
 
         if (res.success) {
-            // Update all rows belonging to this sale
             allTransactions
                 .filter(t => t._saleId === tx._saleId)
                 .forEach(t => (t._status = 'completed'));
@@ -363,9 +319,6 @@ async function toggleStatus(id) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  DELETE
-// ─────────────────────────────────────────────────────────────────────────────
 async function deleteSale(saleId) {
     if (!confirm('Delete this sale and all its items? This cannot be undone.')) return;
 
@@ -386,9 +339,6 @@ async function deleteSale(saleId) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  FILTERS
-// ─────────────────────────────────────────────────────────────────────────────
 function bindFilters() {
     const typeSelect  = document.getElementById('filter-type');
     const searchInput = document.getElementById('filter-search');
@@ -398,7 +348,7 @@ function bindFilters() {
 
     typeSelect?.addEventListener('change', e => {
         filterType = e.target.value;
-        renderTable(); // client-side only, no reload needed
+        renderTable(); 
     });
 
     let searchTimer;
@@ -433,9 +383,6 @@ function bindFilters() {
     });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  REVENUE CHART
-// ─────────────────────────────────────────────────────────────────────────────
 function initRevenueChart() {
     if (typeof Chart === 'undefined') {
         console.warn('Chart.js not loaded.');
@@ -509,11 +456,6 @@ function updateRevenueChart() {
     revenueChart.update();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  NEW SALE MODAL
-// ─────────────────────────────────────────────────────────────────────────────
-
-/** Load clients from the API and populate the select */
 async function loadClientsForModal() {
     try {
         const url = buildUrl(route('clientsList'), { per_page: 200 });
@@ -535,14 +477,12 @@ async function loadClientsForModal() {
     }
 }
 
-/** Bind modal interactions */
 function bindModal() {
     document.getElementById('btn-add-product')?.addEventListener('click', addProductRow);
     document.getElementById('btn-add-service')?.addEventListener('click', addServiceRow);
     document.getElementById('btn-save-sale')?.addEventListener('click', createSale);
     document.getElementById('sale-discount')?.addEventListener('input', updateTotalsPreview);
 
-    // Reset modal on close
     document.getElementById('newSaleModal')?.addEventListener('hidden.bs.modal', resetModal);
 }
 
@@ -617,7 +557,6 @@ function resetModal() {
     updateTotalsPreview();
 }
 
-/** Collect form data and POST to Symfony API */
 async function createSale() {
     const clientId     = document.getElementById('sale-client-id').value;
     const saleDate     = document.getElementById('sale-date').value;
@@ -626,12 +565,10 @@ async function createSale() {
     const discount     = parseFloat(document.getElementById('sale-discount').value || 0);
     const notes        = document.getElementById('sale-notes').value.trim();
 
-    // Validation
     if (!clientId)  { showToast('Please select a client.',         'warning'); return; }
     if (!saleDate)  { showToast('Please enter a sale date.',       'warning'); return; }
     if (!payMethod) { showToast('Please select a payment method.', 'warning'); return; }
 
-    // Collect product rows
     const productItems = [];
     let productValid = true;
     document.querySelectorAll('#product-items-container .item-row').forEach(row => {
@@ -642,7 +579,6 @@ async function createSale() {
         productItems.push({ product_name: name, quantity: qty, unit_price: price });
     });
 
-    // Collect service rows
     const serviceItems = [];
     let serviceValid = true;
     document.querySelectorAll('#service-items-container .item-row').forEach(row => {
@@ -684,10 +620,8 @@ async function createSale() {
 
         if (res.success) {
             showToast(`Sale created! TX: ${res.transaction_id}`, 'success');
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('newSaleModal'))?.hide();
             resetModal();
-            // Reload data
             loadTransactions(1);
             loadStats();
         } else {
@@ -702,9 +636,6 @@ async function createSale() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  INVOICE (PDF)
-// ─────────────────────────────────────────────────────────────────────────────
 async function generateInvoice(saleId) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -715,7 +646,6 @@ async function generateInvoice(saleId) {
 
         const data = result.data;
 
-        // Header band
         doc.setFillColor(56, 128, 135);
         doc.rect(0, 0, 210, 40, 'F');
 
@@ -731,7 +661,6 @@ async function generateInvoice(saleId) {
         doc.text(`Date: ${data.sale_date}`,             130, 26);
         doc.text(`Method: ${data.payment_method}`,      130, 32);
 
-        // Bill to
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
@@ -741,7 +670,6 @@ async function generateInvoice(saleId) {
         if (data.client_email) doc.text(data.client_email, 20, 68);
         if (data.client_phone) doc.text(data.client_phone, 20, 74);
 
-        // Items table header
         let yPos = 90;
         doc.setFillColor(240, 240, 240);
         doc.rect(20, yPos, 170, 8, 'F');
@@ -771,7 +699,6 @@ async function generateInvoice(saleId) {
             yPos += 8;
         });
 
-        // Totals
         yPos += 10;
         doc.line(130, yPos, 190, yPos);
         yPos += 10;
@@ -789,7 +716,6 @@ async function generateInvoice(saleId) {
         doc.text('TOTAL PAID:', 130, yPos);
         doc.text(`$${parseFloat(data.total_amount).toFixed(2)}`, 170, yPos);
 
-        // Footer note
         doc.setFontSize(9);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(150);

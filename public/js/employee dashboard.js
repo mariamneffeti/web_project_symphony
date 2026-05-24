@@ -1,41 +1,26 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────────────────────────────────────
 let receiptModal = null;
 let salesChart   = null;
 let PRODUCT_DATA = [];
 let SERVICE_DATA = [];
 let currentMode  = 'sales';
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Bootstrap receipt modal
     const receiptModalEl = document.getElementById('receiptModal');
     if (receiptModalEl) receiptModal = new bootstrap.Modal(receiptModalEl);
 
-    // Process button
     document.getElementById('btn-process-transaction')
         ?.addEventListener('click', processTransaction);
 
-    // Client search
     initClientSearch();
 
-    // Discount live update
     document.getElementById('discount-input')
         ?.addEventListener('input', updateTotals);
 
-    // Load stats + catalogue data
     loadDashboardData();
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
 
-/** Fetch wrapper — redirects to logout on 401 */
 async function sessionFetch(url, options = {}) {
     const response = await fetch(url, options);
     if (response.status === 401) {
@@ -53,7 +38,6 @@ function route(name, id = null) {
     return url;
 }
 
-/** Build URL with query params, skipping empty values */
 function buildUrl(base, params = {}) {
     const url = new URL(base, window.location.href);
     Object.entries(params).forEach(([k, v]) => {
@@ -66,9 +50,6 @@ function formatCurrency(amount) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────────────────────────────────────────
 function showToast(message, type = 'info') {
     const colors = { success: '#198754', error: '#dc3545', warning: '#e6a817', info: '#388087' };
     const toast = document.createElement('div');
@@ -87,9 +68,6 @@ function showToast(message, type = 'info') {
     }, 3500);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  DASHBOARD DATA (stats + product/service catalogues)
-// ─────────────────────────────────────────────────────────────────────────────
 async function loadDashboardData() {
     try {
         const [statsRes, prodRes, servRes] = await Promise.all([
@@ -112,7 +90,6 @@ async function loadDashboardData() {
             }
         }
 
-        // Seed the table with one empty row
         const tbody = document.getElementById('services-tbody');
         if (tbody) {
             tbody.innerHTML = '';
@@ -134,9 +111,7 @@ function updateStatsUI(data) {
     set('stat-clients',      data.total_clients      ?? '—');
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  SALES CHART
-// ─────────────────────────────────────────────────────────────────────────────
+
 function updateSalesChart(salesData) {
     const ctx = document.getElementById('salesChart');
     if (!ctx || typeof Chart === 'undefined') return;
@@ -189,9 +164,6 @@ function updateSalesChart(salesData) {
     });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  CLIENT SEARCH
-// ─────────────────────────────────────────────────────────────────────────────
 function initClientSearch() {
     const searchInput   = document.getElementById('client-search-input');
     const resultsDiv    = document.getElementById('search-results');
@@ -200,7 +172,6 @@ function initClientSearch() {
 
     let allClients = [];
 
-    // Pre-load client list for instant filtering
     sessionFetch(buildUrl(route('clientsList'), { per_page: 500 }))
         .then(r => r.json())
         .then(result => { if (result.success) allClients = result.data ?? []; })
@@ -231,7 +202,6 @@ function initClientSearch() {
         }
     });
 
-    // Close dropdown on outside click
     document.addEventListener('click', e => {
         if (!searchInput.contains(e.target)) resultsDiv.classList.add('d-none');
     });
@@ -242,11 +212,9 @@ function selectClient(client) {
     document.getElementById('client-id').value           = client.id;
     document.getElementById('search-results').classList.add('d-none');
 
-    // Fill email if available
     const emailEl = document.getElementById('client-email');
     if (emailEl) emailEl.value = client.email ?? '';
 
-    // Load fresh stats for this client
     updateClientStats(client.id);
 }
 
@@ -267,9 +235,6 @@ async function updateClientStats(clientId) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  MODE TOGGLE (Sales vs Services)
-// ─────────────────────────────────────────────────────────────────────────────
 function setMode(mode) {
     const tbody = document.getElementById('services-tbody');
     if (tbody.children.length > 0) {
@@ -289,9 +254,6 @@ function setMode(mode) {
     updateTotals();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  ITEM ROWS
-// ─────────────────────────────────────────────────────────────────────────────
 function addRow() {
     const tbody = document.getElementById('services-tbody');
     const row   = document.createElement('tr');
@@ -348,9 +310,6 @@ function handleItemSelect(select) {
     updateTotals();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  TOTALS
-// ─────────────────────────────────────────────────────────────────────────────
 function updateTotals() {
     let subtotal = 0;
 
@@ -374,9 +333,6 @@ function updateTotals() {
     set('summary-total',    formatCurrency(total));
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  PROCESS TRANSACTION
-// ─────────────────────────────────────────────────────────────────────────────
 async function processTransaction() {
     const clientId    = document.getElementById('client-id')?.value;
     const clientName  = document.getElementById('client-search-input')?.value;
@@ -384,7 +340,6 @@ async function processTransaction() {
     const discountRaw = parseFloat(document.getElementById('discount-input')?.value || 0);
     const saleDate    = new Date().toISOString().split('T')[0];
 
-    // Validation
     if (!clientId) {
         showToast('Please select a client first.', 'warning');
         return;
@@ -401,7 +356,6 @@ async function processTransaction() {
         service_items:  [],
     };
 
-    // Collect rows
     let hasItems = false;
     document.querySelectorAll('#services-tbody tr').forEach(row => {
         const select = row.querySelector('.item-select');
@@ -437,7 +391,6 @@ async function processTransaction() {
         return;
     }
 
-    // Disable button while saving
     const btn = document.getElementById('btn-process-transaction');
     if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
 
@@ -455,7 +408,7 @@ async function processTransaction() {
             populateReceipt(result, clientName, payload);
             if (receiptModal) receiptModal.show();
             resetForm();
-            loadDashboardData(); // refresh KPIs + chart
+            loadDashboardData(); 
         } else {
             showToast('Error: ' + (result.error || 'Unknown error'), 'error');
             console.error('Transaction error:', result);
@@ -472,9 +425,6 @@ async function processTransaction() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  RECEIPT POPULATION
-// ─────────────────────────────────────────────────────────────────────────────
 function populateReceipt(result, clientName, payload) {
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
@@ -482,7 +432,6 @@ function populateReceipt(result, clientName, payload) {
     set('receipt-date',        new Date().toLocaleDateString('en-US', { dateStyle: 'medium' }));
     set('receipt-client-name', clientName);
 
-    // Items
     const tbody = document.getElementById('receipt-items');
     if (tbody) {
         tbody.innerHTML = '';
@@ -500,16 +449,11 @@ function populateReceipt(result, clientName, payload) {
         });
     }
 
-    // Totals from the summary display
     set('receipt-subtotal', document.getElementById('summary-subtotal')?.textContent ?? '—');
     set('receipt-discount', document.getElementById('summary-discount')?.textContent ?? '—');
     set('receipt-tax',      document.getElementById('summary-tax')?.textContent      ?? '—');
     set('receipt-total',    document.getElementById('summary-total')?.textContent    ?? '—');
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  RESET FORM
-// ─────────────────────────────────────────────────────────────────────────────
 function resetForm() {
     const searchInput = document.getElementById('client-search-input');
     const clientId    = document.getElementById('client-id');
