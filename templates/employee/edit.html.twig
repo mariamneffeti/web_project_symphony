@@ -7,7 +7,7 @@
 {% block stylesheets %}
     <style>
         .edit-card {
-            max-width: 720px;
+            max-width: 780px;
             margin: 0 auto;
             animation: fadeUp .4s ease both;
         }
@@ -31,8 +31,18 @@
         }
 
         .edit-body { padding: 2rem; }
-
         .form-label { font-weight: 600; font-size: .875rem; color: var(--navy); }
+
+        .cv-current {
+            background: rgba(56,128,135,.08);
+            border: 1px dashed var(--teal);
+            border-radius: 8px;
+            padding: .75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            font-size: .875rem;
+        }
     </style>
 {% endblock %}
 
@@ -41,7 +51,8 @@
         <div class="edit-card card shadow-sm">
 
             <div class="edit-header d-flex align-items-center gap-3">
-                <div style="background:rgba(255,255,255,.15);width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+                <div style="background:rgba(255,255,255,.15);width:44px;height:44px;border-radius:10px;
+                    display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
                     <i class="bi bi-pencil-square"></i>
                 </div>
                 <div>
@@ -52,39 +63,86 @@
 
             <div class="edit-body">
                 {{ form_start(form, {
-                    'attr': {'id': 'editForm', 'novalidate': 'novalidate'},
+                    'attr': {
+                        'id': 'editForm',
+                        'novalidate': 'novalidate',
+                        'enctype': 'multipart/form-data'
+                    },
                     'action': path('employee_edit', {id: employee.id}),
                     'method': 'POST'
                 }) }}
 
                 <div class="row g-3">
+
                     <div class="col-md-6">
                         {{ form_label(form.firstName) }}
                         {{ form_widget(form.firstName) }}
                         {{ form_errors(form.firstName) }}
                     </div>
+
                     <div class="col-md-6">
                         {{ form_label(form.email) }}
                         {{ form_widget(form.email) }}
                         {{ form_errors(form.email) }}
                     </div>
+
                     <div class="col-md-6">
                         {{ form_label(form.department) }}
                         {{ form_widget(form.department) }}
                         {{ form_errors(form.department) }}
                     </div>
+
                     <div class="col-md-6">
                         {{ form_label(form.position) }}
                         {{ form_widget(form.position) }}
                         {{ form_errors(form.position) }}
                     </div>
+
+                    {# CV actuel #}
+                    <div class="col-12">
+                        <label class="form-label">Current CV</label>
+                        {% if employee.cvPath %}
+                            <div class="cv-current">
+                                <i class="bi bi-file-earmark-text text-teal" style="color:var(--teal);font-size:1.3rem;"></i>
+                                <div>
+                                    <div class="fw-semibold">CV uploaded</div>
+                                    <a href="{{ asset(employee.cvPath) }}" target="_blank"
+                                       style="color:var(--teal);font-size:.8rem;">
+                                        <i class="bi bi-download me-1"></i>View / Download
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <p class="text-muted small mb-0">No CV uploaded yet.</p>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="col-12">
+                        <label class="form-label">
+                            Upload New CV
+                            <span class="text-muted fw-normal">(optional — leave empty to keep current)</span>
+                        </label>
+                        <input type="file" name="cv_file" id="cvFileInput"
+                               class="form-control" accept=".pdf,.doc,.docx">
+                        <div class="form-text">Accepted: PDF, DOC, DOCX (max 5MB)</div>
+                        <div id="cvPreview" style="display:none; margin-top:.5rem;">
+                    <span class="badge"
+                          style="background:rgba(56,128,135,.12);color:var(--teal);padding:.4em .8em;border-radius:8px;">
+                        <i class="bi bi-file-earmark-text me-1"></i>
+                        <span id="cvFileName"></span>
+                    </span>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="d-flex gap-2 mt-4">
-                    <button type="submit" class="btn btn-teal fw-semibold px-4">
+                    <button type="submit" class="btn btn-teal fw-semibold px-4" id="submitBtn">
                         <i class="bi bi-check-circle me-2"></i>Save Changes
                     </button>
-                    <a href="{{ path('employee_index') }}" class="btn btn-outline-secondary fw-semibold px-4">
+                    <a href="{{ path('employee_index') }}"
+                       class="btn btn-outline-secondary fw-semibold px-4">
                         <i class="bi bi-arrow-left me-2"></i>Cancel
                     </a>
                 </div>
@@ -97,21 +155,45 @@
 
 {% block javascripts %}
     <script>
+        document.getElementById('cvFileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File too large (max 5MB).');
+                this.value = '';
+                return;
+            }
+            document.getElementById('cvFileName').textContent = file.name;
+            document.getElementById('cvPreview').style.display = 'block';
+        });
+
         document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const res  = await fetch(this.action, {
-                method: 'POST',
-                body: new FormData(this),
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
 
-            const json = await res.json();
+            try {
+                const res  = await fetch('{{ path("employee_edit", {id: employee.id}) }}', {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
 
-            if (json.status === 'success') {
-                window.location.href = '{{ path("employee_index") }}';
-            } else {
-                alert(json.message || 'Update failed.');
+                const json = await res.json();
+
+                if (json.status === 'success') {
+                    window.location.href = '{{ path("employee_index") }}';
+                } else {
+                    alert(json.message || 'Update failed.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Save Changes';
+                }
+            } catch (err) {
+                alert('Network error. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Save Changes';
             }
         });
     </script>
