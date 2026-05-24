@@ -1,0 +1,142 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/homeCompany.css') }}">
+{% endblock %}
+
+{% block page_title %}Home{% endblock %}
+{% set active_page = 'Home' %}
+
+{% block body %}
+<section class="hero-section" style="margin-top:56px;">
+  <div class="hero-animated-overlay">
+    <div class="container">
+      <div class="hero-info">
+        <h1>Welcome to {{ company_name }}</h1>
+        <h2>Experience the future of business using ENTREPRISA</h2>
+        <div class="row mb-3 pt-3">
+          <div class="col-auto">
+            <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-lg">Logout</a>
+          </div>
+          <div class="col-auto">
+            <a href="{{ path('profile_index') }}" class="btn btn-outline-warning btn-lg">View Profile</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ══ SERVICES ══ -->
+<section id="services" class="py-5">
+  <div class="container text-center">
+    <p class="section-label mb-2">What we offer</p>
+    <h2 class="section-title mb-5">Our Services</h2>
+ 
+    <div class="row g-4">
+ 
+      <!-- Card 1 – Company -->
+      <div class="col-md-4">
+        <div class="service-card-wrap">
+          <img src="{{asset('images/one.jpg')}}"
+               alt="Company Services" class="service-card-img" />
+          <div class="service-card-body">
+            <div class="card-top-row">
+              <span class="service-badge">Enterprise</span>
+              <div class="service-card-icon"><i class="bi bi-building"></i></div>
+            </div>
+            <h5 class="service-card-title">Company Services</h5>
+            <p class="service-card-desc">End-to-end tools to run and scale your organisation — from HR to sales pipelines.</p>
+            <ul class="service-card-list">
+              <li>Clients &amp; Employees Management</li>
+              <li>Sales Management</li>
+              <li>Recruitment</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Card 2 – Employee -->
+      <div class="col-md-4">
+        <div class="service-card-wrap">
+          <img src="{{asset('images/two.jpg')}}"
+               alt="Employee Services" class="service-card-img" />
+          <div class="service-card-body">
+            <div class="card-top-row">
+              <span class="service-badge">Workforce</span>
+              <div class="service-card-icon"><i class="bi bi-people"></i></div>
+            </div>
+            <h5 class="service-card-title">Employee Services</h5>
+            <p class="service-card-desc">Everything employees need to manage their work, track clients and close more sales.</p>
+            <ul class="service-card-list">
+              <li>Clients Management</li>
+              <li>Sales Management</li>
+              <li>Internal Services</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Card 3 – Client / Applicant -->
+      <div class="col-md-4">
+        <div class="service-card-wrap">
+          <img src="{{asset('images/client.jpg')}}"
+               alt="Client Applicant" class="service-card-img" />
+          <div class="service-card-body">
+            <div class="card-top-row">
+              <span class="service-badge">Applicant</span>
+              <div class="service-card-icon"><i class="bi bi-person-badge"></i></div>
+            </div>
+            <h5 class="service-card-title">Client / Applicant</h5>
+            <p class="service-card-desc">Discover opportunities, build your CV and connect directly with hiring companies.</p>
+            <ul class="service-card-list">
+              <li>Articles Feed</li>
+              <li>Company Offers</li>
+              <li>CV Management</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</section>
+ 
+<!-- ══ CAPABILITIES ══ -->
+<section class="capabilities-section py-5">
+  <div class="container text-center">
+    <div class="mb-5">
+      <h6 class="text-uppercase fw-bold small opacity-50">Capabilities</h6>
+      <h2 class="display-5 fw-bold mb-3">What we bring to the table</h2>
+      <p class="text-secondary mx-auto" style="max-width:600px;">
+        Whether you're running a company, managing a team, or searching for your next opportunity —
+        we connect you with the tools and people that matter.
+      </p>
+    </div>
+    <div class="row g-4 mt-2">
+      <div class="col-md-4">
+        <div class="p-3">
+          <i class="bi bi-briefcase fs-2 mb-3 d-block" style="color:var(--primary-teal);"></i>
+          <h4 class="h5">Seamless Collaboration</h4>
+          <p class="text-secondary small">Unified workspace for companies, employees and clients.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3">
+          <i class="bi bi-globe fs-2 mb-3 d-block" style="color:var(--primary-teal);"></i>
+          <h4 class="h5">Global Reach</h4>
+          <p class="text-secondary small">Access markets and talent across every major region.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3">
+          <i class="bi bi-gear fs-2 mb-3 d-block" style="color:var(--primary-teal);"></i>
+          <h4 class="h5">Expert Support</h4>
+          <p class="text-secondary small">Our team stands ready to help you succeed at every step.</p>
+        </div>
+      </div>
+    </div>
+</section>
+{% endblock %}
