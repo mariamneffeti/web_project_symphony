@@ -58,7 +58,6 @@
     <main class="container page-content mt-4 mb-5">
         <div class="row">
 
-            {# ── LEFT: Avatar card ── #}
             <div class="col-lg-4 mb-4">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="profile-header"></div>
@@ -92,7 +91,6 @@
                 </div>
             </div>
 
-            {# ── RIGHT: Edit form ── #}
             <div class="col-lg-8">
                 <div class="card shadow-sm p-4 h-100" style="border-left:4px solid #388087;">
                     <h3 class="mb-4">Account Settings</h3>
@@ -114,7 +112,6 @@
                         {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
-                    {# Passwords side by side #}
                     <div class="col-md-6">
                         <label class="form-label fw-bold">New Password</label>
                         {{ form_widget(form.plainPassword.first, {
@@ -141,7 +138,7 @@
                         </div>
                     </div>
 
-                    {# Profile picture below #}
+
                     <div class="col-12">
                         <label class="form-label fw-bold">Profile Picture</label>
                         {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
@@ -168,7 +165,7 @@
         </div>
     </main>
 
-    {# ══════════════════ FOOTER ══════════════════ #}
+
     <footer class="footer-forest text-white py-5">
         <div class="container">
             <div class="row gy-4 text-center text-md-start">
