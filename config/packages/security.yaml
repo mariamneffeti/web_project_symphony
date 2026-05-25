@@ -28,14 +28,16 @@ security:
                 always_remember_me: true
 
     access_control:
-        - { path: ^/login,      roles: PUBLIC_ACCESS }
-        - { path: ^/company,    roles: ROLE_COMPANY  }
-        - { path: ^/employee,   roles: ROLE_EMPLOYEE }
-        - { path: ^/normaluser, roles: ROLE_USER     }
-        - { path: ^/clients,    roles: ROLE_USER     }
-        - { path: ^/sales,      roles: ROLE_USER     }
-        - { path: ^/services,   roles: ROLE_USER     }
-        - { path: ^/stock,      roles: ROLE_USER     }
+        - { path: ^/login,          roles: PUBLIC_ACCESS }
+        - { path: ^/registration,   roles: PUBLIC_ACCESS }
+        - { path: ^/profile,        roles: ROLE_USER }
+        - { path: ^/homeCompany,    roles: ROLE_COMPANY  }
+        - { path: ^/employees,      roles: ROLE_COMPANY }
+        - { path: ^/normaluser,     roles: ROLE_USER     }
+        - { path: ^/clients,        roles: ROLE_USER     }
+        - { path: ^/sales,          roles: ROLE_USER     }
+        - { path: ^/services,       roles: ROLE_USER     }
+        - { path: ^/stock,          roles: ROLE_USER     }
 
 when@test:
     security:

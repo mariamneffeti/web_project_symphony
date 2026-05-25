@@ -244,7 +244,6 @@
 
                         <hr class="opacity-15 my-3">
 
-                        {# Meta rows #}
                         <div class="text-start">
                             <div class="meta-row">
                                 <div class="meta-icon"><i class="bi bi-envelope"></i></div>
@@ -282,7 +281,6 @@
 
                     <h3 class="section-title mb-4">Account Settings</h3>
 
-                    {# Flash messages inline #}
                     {% for type, msgs in app.flashes %}
                         {% for msg in msgs %}
                             <div class="alert alert-{{ type == 'success' ? 'success' : 'danger' }} alert-dismissible fade show mb-3" role="alert">
@@ -293,7 +291,7 @@
                         {% endfor %}
                     {% endfor %}
 
-                    {{ form_start(form, {
+                    {{ form_start(profileForm, {
                         'attr': {
                             'id': 'profileForm',
                             'enctype': 'multipart/form-data',
@@ -306,26 +304,27 @@
                     <div class="row g-3">
 
                         <div class="col-md-6">
-                            {{ form_label(form.firstName) }}
-                            {{ form_widget(form.firstName) }}
-                            {{ form_errors(form.firstName) }}
+                            {{ form_label(profileForm.firstName) }}
+                            {{ form_widget(profileForm.firstName) }}
+                            {{ form_errors(profileForm.firstName) }}
                         </div>
                         <div class="col-md-6">
-                            {{ form_label(form.lastName) }}
-                            {{ form_widget(form.lastName) }}
-                            {{ form_errors(form.lastName) }}
+                            {{ form_label(profileForm.lastName) }}
+                            {{ form_widget(profileForm.lastName) }}
+                            {{ form_errors(profileForm.lastName) }}
                         </div>
 
                         <div class="col-12">
-                            {{ form_label(form.email) }}
-                            {{ form_widget(form.email) }}
-                            {{ form_errors(form.email) }}
+                            {{ form_label(profileForm.email) }}
+                            {{ form_widget(profileForm.email) }}
+                            {{ form_errors(profileForm.email) }}
                         </div>
 
                         <div class="col-12">
-                            {{ form_label(form.role) }}
-                            {{ form_widget(form.role) }}
-                            {{ form_errors(form.role) }}
+                            <label class="form-label">Role</label>
+                            <input type="text" class="form-control"
+                                   value="{{ user.role|capitalize }}"
+                                   disabled>
                         </div>
 
                         <div class="col-12">
@@ -337,31 +336,31 @@
                         </div>
 
                         <div class="col-md-6">
-                            {{ form_label(form.plainPassword.first) }}
+                            {{ form_label(profileForm.plainPassword.first) }}
                             <div class="pw-wrap">
-                                {{ form_widget(form.plainPassword.first, {'attr': {'id': 'pw1', 'class': 'form-control'}}) }}
+                                {{ form_widget(profileForm.plainPassword.first, {'attr': {'id': 'pw1', 'class': 'form-control'}}) }}
                                 <button type="button" class="pw-toggle" onclick="togglePw('pw1', this)">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
-                            {{ form_errors(form.plainPassword.first) }}
+                            {{ form_errors(profileForm.plainPassword.first) }}
                         </div>
 
                         <div class="col-md-6">
-                            {{ form_label(form.plainPassword.second) }}
+                            {{ form_label(profileForm.plainPassword.second) }}
                             <div class="pw-wrap">
-                                {{ form_widget(form.plainPassword.second, {'attr': {'id': 'pw2', 'class': 'form-control'}}) }}
+                                {{ form_widget(profileForm.plainPassword.second, {'attr': {'id': 'pw2', 'class': 'form-control'}}) }}
                                 <button type="button" class="pw-toggle" onclick="togglePw('pw2', this)">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
-                            {{ form_errors(form.plainPassword.second) }}
+                            {{ form_errors(profileForm.plainPassword.second) }}
                         </div>
 
                         <div class="col-md-6">
-                            {{ form_label(form.imageFile) }}
-                            {{ form_widget(form.imageFile) }}
-                            {{ form_errors(form.imageFile) }}
+                            {{ form_label(profileForm.imageFile) }}
+                            {{ form_widget(profileForm.imageFile) }}
+                            {{ form_errors(profileForm.imageFile) }}
                             <div id="imagePreviewWrap" style="display:none; align-items:center; margin-top:.5rem;">
                                 <img id="imagePreview" src="" alt="Preview" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:2px solid var(--teal);">
                                 <span class="ms-2 small text-muted">Preview</span>
@@ -380,7 +379,7 @@
                         </button>
                     </div>
 
-                    {{ form_end(form) }}
+                    {{ form_end(profileForm) }}
                 </div>
             </div>
 
@@ -405,7 +404,7 @@
         }
 
 
-        document.getElementById('imageFileInput').addEventListener('change', function() {
+        document.querySelector('[name$="[imageFile]"]').addEventListener('change', function() {
             const file = this.files[0];
             if (!file) return;
 
