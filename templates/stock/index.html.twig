@@ -1,5 +1,5 @@
-
-{% extends 'layout/base.html.twig' %}
+{# templates/stock/index.html.twig #}
+{% extends 'base.html.twig' %}
 
 {% block title %}Stock Management – Employee Dashboard{% endblock %}
 
@@ -10,6 +10,7 @@
 <style>
 body { background: #F6F6F2; font-family: Inter, system-ui, sans-serif; color: #1f2933; }
 
+.navbar { background: #388087; }
 
 .card { border: none; border-radius: 16px; box-shadow: 0 10px 28px rgba(0,0,0,.06); transition: .3s ease; }
 .card:hover { transform: translateY(-4px); }
@@ -38,6 +39,9 @@ body { background: #F6F6F2; font-family: Inter, system-ui, sans-serif; color: #1
 .filter-bar .form-control,
 .filter-bar .form-select { border-radius: 10px; border-color: #d1d5db; font-size: .9rem; }
 
+footer { background: linear-gradient(180deg,#388087,#0d1f1b); }
+.footer-link { color: rgba(255,255,255,0.8); text-decoration: none; }
+.footer-link:hover { color: white; padding-left: 5px; }
 
 @keyframes fadeSlideIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 .animate-in { animation: fadeSlideIn .4s ease both; }
@@ -188,7 +192,42 @@ body { background: #F6F6F2; font-family: Inter, system-ui, sans-serif; color: #1
   </div>
 </div>
 
-
+{# ── Footer ── #}
+<footer class="text-white py-5 mt-4" style="background: linear-gradient(180deg,#388087,#0d1f1b); min-height:360px;">
+  <div class="container" style="margin-top:4rem;">
+    <div class="row gy-4">
+      <div class="col-lg-4 col-md-12">
+        <span class="fw-bold fs-4 text-uppercase">Entreprisa</span>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Start your business</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Join us as a company leader</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Try Entreprisa</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">The Product</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Contact us</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Questions</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Blog</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <h6 class="text-uppercase small fw-bold mb-3 opacity-50">Legal</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Terms &amp; Conditions</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Privacy policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="opacity-25">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-50 pt-3">
+      <p class="mb-0">© 2026 Entreprisa. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
 
 {% endblock %}
 
