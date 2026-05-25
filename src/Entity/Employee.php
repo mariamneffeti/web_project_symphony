@@ -19,8 +19,9 @@ class Employee
     #[ORM\Column(name: 'user_id')]
     private ?int $userId = null;
 
-    #[ORM\Column(name: 'company_id')]
-    private ?int $companyId = null;
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Company $company = null;
 
     #[ORM\Column(length: 100, name: 'first_name')]
     private ?string $firstName = null;
@@ -74,14 +75,14 @@ class Employee
         return $this;
     }
 
-    public function getCompanyId(): ?int
+    public function getCompany(): ?Company
     {
-        return $this->companyId;
+        return $this->company;
     }
 
-    public function setCompanyId(int $companyId): static
+    public function setCompany(?Company $company): static
     {
-        $this->companyId = $companyId;
+        $this->company = $company;
         return $this;
     }
 
