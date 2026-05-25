@@ -612,19 +612,3 @@ if (!in_array($fileExtension, $allowedExtensions)) {
 - [ ] **#17** - Centralize external CDN URLs
 
 ---
-
-## 📞 Questions to Ask
-
-1. **Company Context:** How should the app determine which company the logged-in user belongs to? Implement `getCompanyContext()` properly.
-2. **File Storage:** Should uploaded files be stored outside the web root for security?
-3. **Multi-tenant:** Is this a multi-company SaaS app? Need proper tenant isolation.
-4. **Email System:** Can you send password reset emails instead of showing temporary passwords?
-5. **Database:** Should primary key queries validate that the resource belongs to the user's company?
-
----
-
-**Document Generated:** May 25, 2026  
-**Total Issues Found:** 120+  
-**Critical Issues:** 4  
-**High Priority Issues:** 5+  
-**Medium Priority Issues:** 11+
