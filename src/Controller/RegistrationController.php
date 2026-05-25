@@ -52,8 +52,8 @@ return $this->redirectToRoute(
     }
 );
         }
-            return $this->render('registration/registration.html.twig',
-                'registrationForm' => $form->createView()]);
+            return $this->render('registration/registration.html.twig',[
+                'registrationForm'=> $form->createView()]);
         }
 
 }
