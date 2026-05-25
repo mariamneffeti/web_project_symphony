@@ -15,6 +15,10 @@ class Client
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Company $company = null;
+
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     private ?string $clientName = null;
@@ -39,6 +43,10 @@ class Client
 
     public function getId(): ?int { return $this->id; }
 
+    // FIX: Add getter and setter for the Company relationship
+    public function getCompany(): ?Company { return $this->company; }
+    public function setCompany(?Company $company): static { $this->company = $company; return $this; }
+
     public function getClientName(): ?string { return $this->clientName; }
     public function setClientName(string $clientName): static { $this->clientName = $clientName; return $this; }
 
@@ -57,8 +65,6 @@ class Client
     public function getStatus(): string { return $this->status; }
     public function setStatus(string $status): static { $this->status = $status; return $this; }
 
-    
-
     public function toArray(): array
     {
         return [
@@ -69,6 +75,8 @@ class Client
             'address'          => $this->address,
             'client_type'      => $this->clientType,
             'status'           => $this->status,
+            // Optional layout trace
+            'company_id'       => $this->company ? $this->company->getId() : null,
         ];
     }
 }
